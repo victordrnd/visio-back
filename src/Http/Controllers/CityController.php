@@ -19,7 +19,7 @@ class CityController extends Controller
      */
     public function show(Request $req, int $id)
     {
-        $city = City::find($id);
+        $city = City::find($id)->with('country');
         return response()->json($city);
         // echo Renderer::render('city/city.php', compact("city", 'country'));
     }

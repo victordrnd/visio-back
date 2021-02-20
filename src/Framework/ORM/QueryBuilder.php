@@ -6,16 +6,14 @@ use Framework\Core\Singleton;
 use Framework\ORM\Relationship;
 use Framework\Core\Collection;
 
-abstract class QueryBuilder extends Relationship
-{
+abstract class QueryBuilder extends Relationship {
     /**
      * Find entity with selected id
      *
      * @param int $id
      */
-    public static function find(int $id)
-    {
-        $SQL = "SELECT * FROM " . static::table() . " WHERE " . static::$primaryKey . " = :id";
+    public static function find(int $id) {
+        $SQL = "SELECT * FROM " . self::table() . " WHERE " . static::$primaryKey . " = :id";
         $statement = Singleton::getInstance()->cnx->prepare($SQL);
         $statement->bindParam('id', $id);
         $statement->execute();
@@ -30,9 +28,8 @@ abstract class QueryBuilder extends Relationship
      * @param int $id
      * @return void
      */
-    public function remove(): void
-    {
-        $SQL = "DELETE FROM " . static::table() . " WHERE " . static::$primaryKey . " =:id";
+    public function remove(): void {
+        $SQL = "DELETE FROM " . self::table() . " WHERE " . static::$primaryKey . " =:id";
         $statement = Singleton::getInstance()->cnx->prepare($SQL);
         $primaryKeyValue = $this->getPrimaryKeyValue();
         $statement->bindParam("id", $primaryKeyValue);
@@ -47,8 +44,7 @@ abstract class QueryBuilder extends Relationship
      *
      * @return void
      */
-    public function save(): void
-    {
+    public function save(): void {
         if ($this->getPrimaryKeyValue() != 0) {
             $values = [];
             foreach (static::$attributes as $column) {
@@ -57,9 +53,9 @@ abstract class QueryBuilder extends Relationship
             $this->update($values);
         }
         $values = [];
-        $SQL = "INSERT INTO " . static::table() . " VALUES (";
+        $SQL = "INSERT INTO " . self::table() . " VALUES (";
         foreach (static::$attributes as $index => $attribut) {
-            if ($index + 1 == count(static::$attributes)) { 
+            if ($index + 1 == count(static::$attributes)) {
                 $SQL .= "?)";
             } else {
                 $SQL .= "?,";
@@ -79,9 +75,8 @@ abstract class QueryBuilder extends Relationship
      * @param array $columns
      * @return void
      */
-    public static function create(array $columns)
-    {
-        $SQL = "INSERT INTO " . static::table() . " (";
+    public static function create(array $columns) {
+        $SQL = "INSERT INTO " . self::table() . " (";
         $last_key = end(array_keys($columns));
         $indexed = "(";
         foreach ($columns as $key => $column) {
@@ -114,13 +109,12 @@ abstract class QueryBuilder extends Relationship
      * @param array $columns
      * @return void
      */
-    public function update(array $columns): void
-    {
+    public function update(array $columns): void {
         if ($this->getPrimaryKeyValue() == 0) {
             $this->save();
         } else {
             $class = new \ReflectionClass(get_called_class());
-            $SQL = "UPDATE " . static::table() . " SET ";
+            $SQL = "UPDATE " . self::table() . " SET ";
             $last_key = end(array_keys($columns));
             foreach ($columns as $key => $value) {
                 if ($key != $last_key) {
@@ -150,9 +144,8 @@ abstract class QueryBuilder extends Relationship
      *
      * @return array
      */
-    public static function all(): array
-    {
-        $SQL = "SELECT * FROM " . static::table();
+    public static function all(): array {
+        $SQL = "SELECT * FROM " . self::table();
         $statement = Singleton::getInstance()->cnx->prepare($SQL);
         $statement->execute();
         $statement->setFetchMode(\PDO::FETCH_CLASS, get_called_class());
@@ -166,9 +159,8 @@ abstract class QueryBuilder extends Relationship
      *
      * @return integer
      */
-    public static function count(): int
-    {
-        $SQL = "SELECT COUNT(*) as count FROM " . static::table();
+    public static function count(): int {
+        $SQL = "SELECT COUNT(*) as count FROM " . self::table();
         $statement = Singleton::getInstance()->cnx->prepare($SQL);
         $statement->execute();
         $res = $statement->fetchObject();
@@ -183,13 +175,12 @@ abstract class QueryBuilder extends Relationship
      * @param [type] $value
      * @return void
      */
-    public static function where($column, $operator = "=", $value = null)
-    {
-        $operators = ['=', '>=', '>', '<', '<=', '!=', 'LIKE','NOT LIKE'];
+    public static function where($column, $operator = "=", $value = null) {
+        $operators = ['=', '>=', '>', '<', '<=', '!=', 'LIKE', 'NOT LIKE'];
         if (in_array($operator, $operators)) {
-            $SQL = "SELECT * FROM " . static::table() . " WHERE " . $column . " " . $operator . " ?";
+            $SQL = "SELECT * FROM " . self::table() . " WHERE " . $column . " " . $operator . " ?";
         } else {
-            $SQL = "SELECT * FROM " . static::$table . " WHERE " . $column . " = ?";
+            $SQL = "SELECT * FROM " . self::table() . " WHERE " . $column . " = ?";
             $value = $operator;
         }
         $statement = Singleton::getInstance()->cnx->prepare($SQL);
@@ -205,12 +196,27 @@ abstract class QueryBuilder extends Relationship
      *
      * @return void
      */
-    public static function last()
-    {
+    public static function last() {
         $SQL = "SELECT * FROM " . static::$table . " ORDER BY " . static::$primaryKey . " DESC LIMIT 1";
         $statement = Singleton::getInstance()->cnx->prepare($SQL);
         $statement->execute();
         $object = $statement->fetchObject(get_called_class());
         return $object;
+    }
+
+
+    public function with(string ...$args) {
+        foreach ($args as $arg) {
+            $this->{$arg} = call_user_func(array($this, $arg));
+        }
+        return $this;
+    }
+
+
+
+    protected static function table() {
+        $class_path = explode("\\", get_called_class());
+        $table_name = strtolower(array_pop($class_path));
+        return $table_name;
     }
 }

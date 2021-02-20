@@ -4,7 +4,7 @@ namespace Framework\Core;
 
 use Framework\ORM\QueryBuilder;
 
-abstract class Model extends QueryBuilder{
+abstract class Model extends QueryBuilder implements \JsonSerializable{
 
     protected static $table = "";
     
@@ -12,15 +12,8 @@ abstract class Model extends QueryBuilder{
 
     protected $model_properties = [];
 
-
-    protected static function table(){
-        if(!static::$table){
-            $class_path = explode("\\", get_called_class());
-            static::$table = strtolower(array_pop($class_path));
-        }
-        return static::$table;
-    }
-
+    protected $hidden = [];
+    
 
     public function __get(string $name){
         if(isset($this->model_properties[$name]))
@@ -46,9 +39,14 @@ abstract class Model extends QueryBuilder{
     }
 
 
-    public function __toString()
+    public function jsonSerialize()
     {
-        return json_encode($this->model_properties);
+        $cloned_properties = (array)clone(object)$this->model_properties;
+        foreach($this->hidden as $hidden_key){
+            if(isset($cloned_properties[$hidden_key]))
+                unset($cloned_properties[$hidden_key]);
+        }
+        return $cloned_properties;
     }
 }
 ?>

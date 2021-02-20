@@ -17,6 +17,7 @@ class Country extends Model
     */
    protected static $primaryKey = "Country_Id";
 
+
    /**
     * List of all table column
     *
@@ -26,6 +27,8 @@ class Country extends Model
       'Code', 'Name', 'Continent', 'Region', 'SurfaceArea', 'IndepYear',
       'Population', 'LifeExpectancy', 'GNP', 'GNPOld', 'LocalName', 'GovernmentForm', 'HeadOfState', 'Capital', 'Code2', 'Image1', 'Image2'
    ];
+
+   protected $hidden = ["Image1", "Image2"];
    
    public function cities(){
       return $this->hasMany(City::class, 'Code', 'CountryCode');
