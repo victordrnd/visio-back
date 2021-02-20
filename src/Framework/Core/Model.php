@@ -12,7 +12,7 @@ abstract class Model implements \JsonSerializable{
     
     protected static $primaryKey = "id";
 
-    protected $model_properties = [];
+    private $model_properties = [];
 
     protected $hidden = [];
     
