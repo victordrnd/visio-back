@@ -5,8 +5,8 @@ namespace Framework\ORM;
 use Framework\Core\Environment;
 use Framework\ORM\Relationship;
 use Framework\Core\Collection;
-
-trait QueryBuilder {
+use Framework\ORM\Query\BaseQuery;
+class QueryBuilder extends BaseQuery{
     use Relationship;
 
     /**
@@ -16,12 +16,10 @@ trait QueryBuilder {
      */
     public static function find(int $id) {
         $SQL = "SELECT * FROM " . self::table() . " WHERE " . static::$primaryKey . " = :id";
-        //$SQL = "SELECT city.*, ':',country.* from city, country where City_Id = 2 and Code = CountryCode";
         $statement = Environment::getInstance()->cnx->prepare($SQL);
         $statement->bindParam('id', $id);
         $statement->execute();
         $object = $statement->fetchObject(get_called_class());
-        //$object = $statement->fetchObject();
         return $object;
     }
 
@@ -101,8 +99,7 @@ trait QueryBuilder {
         $cnx->setAttribute(\PDO::ATTR_EMULATE_PREPARES, TRUE);
         $statement = $cnx->prepare($SQL);
         $statement->execute($values);
-        $last_insert = get_called_class()::last();
-        return get_called_class()::find($last_insert->getPrimaryKeyValue());
+        return get_called_class()::find($cnx->lastInsertId());
     }
 
 
@@ -159,41 +156,6 @@ trait QueryBuilder {
 
 
 
-    /**
-     * Return count of rows in table associated with model
-     * @return integer
-     */
-    public static function count(): int {
-        $SQL = "SELECT COUNT(*) as count FROM " . self::table();
-        $statement = Environment::getInstance()->cnx->prepare($SQL);
-        $statement->execute();
-        $res = $statement->fetchObject();
-        return $res->count;
-    }
-
-
-    /**
-     * Return array of Object with specified conditions
-     *
-     * @param [type] $column
-     * @param [type] $value
-     * @return void
-     */
-    public static function where($column, $operator = "=", $value = null) {
-        $operators = ['=', '>=', '>', '<', '<=', '!=', 'LIKE', 'NOT LIKE'];
-        if (in_array($operator, $operators)) {
-            $SQL = "SELECT * FROM " . self::table() . " WHERE " . $column . " " . $operator . " ?";
-        } else {
-            $SQL = "SELECT * FROM " . self::table() . " WHERE " . $column . " = ?";
-            $value = $operator;
-        }
-        $statement = Environment::getInstance()->cnx->prepare($SQL);
-        $statement->execute(array($value));
-        $statement->setFetchMode(\PDO::FETCH_CLASS, get_called_class());
-        $array = $statement->fetchAll();
-        return new Collection($array);
-    }
-
 
     /**
      * Return last inserted Object from calling class
@@ -209,18 +171,35 @@ trait QueryBuilder {
     }
 
 
-    public function with(string ...$args) {
-        foreach ($args as $arg) {
+    public function with(...$args) {
+        $relationship_index = -1;
+        foreach ($args as $index => $arg) {
+            if (strpos($arg, ".") !== false) {
+                $relationship_index = $index;
+                break; 
+            }
             $this->{$arg} = call_user_func(array($this, $arg));
+        }
+        if($relationship_index != -1){
+            $nested_relationships = [];
+            $args = array_slice($args, $relationship_index);
+            foreach($args as &$arg){
+                $point_index = strpos($arg, ".");
+                $prefix = explode(".",$arg)[0];
+                $arg = substr($arg, $point_index+1);
+                $nested_relationships[$prefix][] = $arg;
+            }
+            foreach($nested_relationships as $nested_key => $nested_value){
+                call_user_func_array(array($this->{$nested_key}, "with"), $nested_value);
+            }
+
         }
         return $this;
     }
 
 
 
-    protected static function table() {
-        $class_path = explode("\\", get_called_class());
-        $table_name = strtolower(array_pop($class_path));
-        return $table_name;
+    protected static function table($entity = null) {
+        return parent::table(get_called_class());
     }
 }

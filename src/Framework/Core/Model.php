@@ -4,9 +4,7 @@ namespace Framework\Core;
 
 use Framework\ORM\QueryBuilder;
 
-abstract class Model implements \JsonSerializable{
-
-    use QueryBuilder;
+abstract class Model extends QueryBuilder implements \JsonSerializable {
     
     protected static $table = "";
     

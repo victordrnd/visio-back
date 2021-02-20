@@ -16,9 +16,9 @@ class CityController extends Controller
      * @param int $id
      * @return void
      */
-    public function show(Request $req, int $id)
+    public function show(int $id)
     {
-        $city = City::find($id)->with('country');
+        $city = City::where("City_Id", $id)->orderBy("CountryCode", "DESC")->orderBy("City_Id")->with('country')->get();
         return response()->json($city);
         
     }

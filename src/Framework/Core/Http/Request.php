@@ -66,7 +66,7 @@ class Request
 
     public function __get($property)
     {
-        return null;
+        return $this->params[$property];
     }
 }
 
