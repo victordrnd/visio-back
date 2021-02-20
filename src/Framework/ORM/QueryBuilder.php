@@ -2,11 +2,13 @@
 
 namespace Framework\ORM;
 
-use Framework\Core\Singleton;
+use Framework\Core\Environment;
 use Framework\ORM\Relationship;
 use Framework\Core\Collection;
 
-abstract class QueryBuilder extends Relationship {
+trait QueryBuilder {
+    use Relationship;
+
     /**
      * Find entity with selected id
      *
@@ -14,10 +16,12 @@ abstract class QueryBuilder extends Relationship {
      */
     public static function find(int $id) {
         $SQL = "SELECT * FROM " . self::table() . " WHERE " . static::$primaryKey . " = :id";
-        $statement = Singleton::getInstance()->cnx->prepare($SQL);
+        //$SQL = "SELECT city.*, ':',country.* from city, country where City_Id = 2 and Code = CountryCode";
+        $statement = Environment::getInstance()->cnx->prepare($SQL);
         $statement->bindParam('id', $id);
         $statement->execute();
         $object = $statement->fetchObject(get_called_class());
+        //$object = $statement->fetchObject();
         return $object;
     }
 
@@ -30,7 +34,7 @@ abstract class QueryBuilder extends Relationship {
      */
     public function remove(): void {
         $SQL = "DELETE FROM " . self::table() . " WHERE " . static::$primaryKey . " =:id";
-        $statement = Singleton::getInstance()->cnx->prepare($SQL);
+        $statement = Environment::getInstance()->cnx->prepare($SQL);
         $primaryKeyValue = $this->getPrimaryKeyValue();
         $statement->bindParam("id", $primaryKeyValue);
         if ($statement->execute()) {
@@ -62,10 +66,10 @@ abstract class QueryBuilder extends Relationship {
             }
             $values[] = $this->{$attribut};
         }
-        $statement = Singleton::getInstance()->cnx->prepare($SQL);
+        $statement = Environment::getInstance()->cnx->prepare($SQL);
         $code = $statement->execute($values);
         if ($code) {
-            $this->setPrimaryKeyValue($this->cnx->lastInsertId());
+            $this->setPrimaryKeyValue(Environment::getInstance()->cnx->lastInsertId());
         }
     }
 
@@ -93,7 +97,7 @@ abstract class QueryBuilder extends Relationship {
         foreach ($values as &$value) {
             $value = htmlspecialchars($value);
         }
-        $cnx = Singleton::getInstance()->cnx;
+        $cnx = Environment::getInstance()->cnx;
         $cnx->setAttribute(\PDO::ATTR_EMULATE_PREPARES, TRUE);
         $statement = $cnx->prepare($SQL);
         $statement->execute($values);
@@ -133,7 +137,7 @@ abstract class QueryBuilder extends Relationship {
             }
             $id = $this->getPrimaryKeyValue();
             $values[] = $id;
-            $statement = Singleton::getInstance()->cnx->prepare($SQL);
+            $statement = Environment::getInstance()->cnx->prepare($SQL);
             $statement->execute($values);
         }
     }
@@ -146,7 +150,7 @@ abstract class QueryBuilder extends Relationship {
      */
     public static function all(): array {
         $SQL = "SELECT * FROM " . self::table();
-        $statement = Singleton::getInstance()->cnx->prepare($SQL);
+        $statement = Environment::getInstance()->cnx->prepare($SQL);
         $statement->execute();
         $statement->setFetchMode(\PDO::FETCH_CLASS, get_called_class());
         $array = $statement->fetchAll();
@@ -156,12 +160,12 @@ abstract class QueryBuilder extends Relationship {
 
 
     /**
-     *
+     * Return count of rows in table associated with model
      * @return integer
      */
     public static function count(): int {
         $SQL = "SELECT COUNT(*) as count FROM " . self::table();
-        $statement = Singleton::getInstance()->cnx->prepare($SQL);
+        $statement = Environment::getInstance()->cnx->prepare($SQL);
         $statement->execute();
         $res = $statement->fetchObject();
         return $res->count;
@@ -183,7 +187,7 @@ abstract class QueryBuilder extends Relationship {
             $SQL = "SELECT * FROM " . self::table() . " WHERE " . $column . " = ?";
             $value = $operator;
         }
-        $statement = Singleton::getInstance()->cnx->prepare($SQL);
+        $statement = Environment::getInstance()->cnx->prepare($SQL);
         $statement->execute(array($value));
         $statement->setFetchMode(\PDO::FETCH_CLASS, get_called_class());
         $array = $statement->fetchAll();
@@ -198,7 +202,7 @@ abstract class QueryBuilder extends Relationship {
      */
     public static function last() {
         $SQL = "SELECT * FROM " . static::$table . " ORDER BY " . static::$primaryKey . " DESC LIMIT 1";
-        $statement = Singleton::getInstance()->cnx->prepare($SQL);
+        $statement = Environment::getInstance()->cnx->prepare($SQL);
         $statement->execute();
         $object = $statement->fetchObject(get_called_class());
         return $object;

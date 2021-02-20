@@ -4,8 +4,10 @@ namespace Framework\Core;
 
 use Framework\ORM\QueryBuilder;
 
-abstract class Model extends QueryBuilder implements \JsonSerializable{
+abstract class Model implements \JsonSerializable{
 
+    use QueryBuilder;
+    
     protected static $table = "";
     
     protected static $primaryKey = "id";
@@ -41,11 +43,7 @@ abstract class Model extends QueryBuilder implements \JsonSerializable{
 
     public function jsonSerialize()
     {
-        $cloned_properties = (array)clone(object)$this->model_properties;
-        foreach($this->hidden as $hidden_key){
-            if(isset($cloned_properties[$hidden_key]))
-                unset($cloned_properties[$hidden_key]);
-        }
+        $cloned_properties = array_diff_key($this->model_properties, array_flip($this->hidden));
         return $cloned_properties;
     }
 }

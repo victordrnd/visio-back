@@ -5,7 +5,7 @@ namespace Http\Controllers;
 use Models\User;
 use Models\Role;
 use Models\UserRole;
-use Framework\Core\Request;
+use Framework\Core\Http\Request;
 
 class AdminController extends Controller
 {

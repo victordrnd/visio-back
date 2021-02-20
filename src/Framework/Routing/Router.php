@@ -1,30 +1,30 @@
 <?php
 namespace Framework\Routing;
 use Framework\Core\Resolver;
-use Framework\Core\Response;
+use Framework\Core\Http\Response;
 
 class Router
 {
 
-    private $afterRoutes = [];
+    private static $afterRoutes = [];
 
 
-    private $beforeRoutes = [];
+    private static $beforeRoutes = [];
 
 
-    protected $notFoundCallback;
+    protected static $notFoundCallback;
 
 
-    private $baseRoute = '';
+    private static $baseRoute = '';
 
 
-    private $requestedMethod = '';
+    private static $requestedMethod = '';
 
 
-    private $serverBasePath;
+    private static $serverBasePath;
 
 
-    private $namespace = '';
+    private static $namespace = '\Http\Controllers';
 
 
     /**
@@ -35,13 +35,13 @@ class Router
      * @param [type] $fn
      * @return void
      */
-    public function before($methods, $pattern, \Closure $fn) : void
+    public static function before($methods, $pattern, \Closure $fn) : void
     {
-        $pattern = $this->baseRoute . '/' . trim($pattern, '/');
-        $pattern = $this->baseRoute ? rtrim($pattern, '/') : $pattern;
+        $pattern = static::$baseRoute . '/' . trim($pattern, '/');
+        $pattern = static::$baseRoute ? rtrim($pattern, '/') : $pattern;
 
         foreach (explode('|', $methods) as $method) {
-            $this->beforeRoutes[$method][] = [
+            static::$beforeRoutes[$method][] = [
                 'pattern' => $pattern,
                 'fn' => $fn,
             ];
@@ -57,12 +57,12 @@ class Router
      * @param [type] $fn
      * @return void
      */
-    public function match($methods, $pattern, $fn) : void
+    public static function match($methods, $pattern, $fn) : void
     {
-        $pattern = $this->baseRoute . '/' . trim($pattern, '/');
-        $pattern = $this->baseRoute ? rtrim($pattern, '/') : $pattern;
+        $pattern = static::$baseRoute . '/' . trim($pattern, '/');
+        $pattern = static::$baseRoute ? rtrim($pattern, '/') : $pattern;
         foreach (explode('|', $methods) as $method) {
-            $this->afterRoutes[$method][] = [
+            static::$afterRoutes[$method][] = [
                 'pattern' => $pattern,
                 'fn' => $fn,
             ];
@@ -77,9 +77,9 @@ class Router
      * @param [type] $fn
      * @return void
      */
-    public function all($pattern,  $fn) : void
+    public static function all($pattern,  $fn) : void
     {
-        $this->match('GET|POST|PUT|DELETE|OPTIONS|PATCH|HEAD', $pattern, $fn);
+        self::match('GET|POST|PUT|DELETE|OPTIONS|PATCH|HEAD', $pattern, $fn);
     }
 
 
@@ -90,9 +90,9 @@ class Router
      * @param [type] $fn
      * @return void
      */
-    public function get($pattern, $fn) : void
+    public static function get($pattern, $fn) : void
     {
-        $this->match('GET', $pattern, $fn);
+        self::match('GET', $pattern, $fn);
     }
 
 
@@ -103,9 +103,9 @@ class Router
      * @param [type] $fn
      * @return void
      */
-    public function post($pattern, $fn) :void
+    public static function post($pattern, $fn) :void
     {
-        $this->match('POST', $pattern, $fn);
+        self::match('POST', $pattern, $fn);
     }
 
 
@@ -116,9 +116,9 @@ class Router
      * @param [type] $fn
      * @return void
      */
-    public function patch($pattern, \Closure $fn) :void
+    public static function patch($pattern, \Closure $fn) :void
     {
-        $this->match('PATCH', $pattern, $fn);
+        self::match('PATCH', $pattern, $fn);
     }
 
 
@@ -129,9 +129,9 @@ class Router
      * @param [type] $fn
      * @return void
      */
-    public function delete($pattern, $fn) :void
+    public static function delete($pattern, $fn) :void
     {
-        $this->match('DELETE', $pattern, $fn);
+        self::match('DELETE', $pattern, $fn);
     }
 
 
@@ -142,9 +142,9 @@ class Router
      * @param [type] $fn
      * @return void
      */
-    public function put($pattern, $fn) :void
+    public static function put($pattern, $fn) :void
     {
-        $this->match('PUT', $pattern, $fn);
+        self::match('PUT', $pattern, $fn);
     }
 
 
@@ -155,9 +155,9 @@ class Router
      * @param [type] $fn
      * @return void
      */
-    public function options($pattern, $fn) :void
+    public static function options($pattern, $fn) :void
     {
-        $this->match('OPTIONS', $pattern, $fn);
+        self::match('OPTIONS', $pattern, $fn);
     }
 
 
@@ -168,12 +168,12 @@ class Router
      * @param callback $fn
      * @return void
      */
-    public function group(string $baseRoute, \Closure $fn)
+    public static function group(string $baseRoute, \Closure $fn)
     {
-        $curBaseRoute = $this->baseRoute;
-        $this->baseRoute .= $baseRoute;
+        $curBaseRoute = static::$baseRoute;
+        static::$baseRoute .= $baseRoute;
         call_user_func($fn);
-        $this->baseRoute = $curBaseRoute;
+        static::$baseRoute = $curBaseRoute;
     }
 
 
@@ -182,7 +182,7 @@ class Router
      *
      * @return void
      */
-    public function getRequestHeaders()
+    public static function getRequestHeaders()
     {
         $headers = [];
         if (function_exists('getallheaders')) {
@@ -204,14 +204,14 @@ class Router
      *
      * @return string
      */
-    public function getRequestMethod(): string
+    public static function getRequestMethod(): string
     {
         $method = $_SERVER['REQUEST_METHOD'];
         if ($_SERVER['REQUEST_METHOD'] == 'HEAD') {
             ob_start();
             $method = 'GET';
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $headers = $this->getRequestHeaders();
+            $headers = self::getRequestHeaders();
             if (isset($headers['X-HTTP-Method-Override']) && in_array($headers['X-HTTP-Method-Override'], ['PUT', 'DELETE', 'PATCH'])) {
                 $method = $headers['X-HTTP-Method-Override'];
             }
@@ -225,10 +225,10 @@ class Router
      * @param [type] $namespace
      * @return void
      */
-    public function setNamespace(string $namespace)
+    public static function setNamespace(string $namespace)
     {
         if (is_string($namespace)) {
-            $this->namespace = $namespace;
+            static::$namespace = $namespace;
         }
     }
 
@@ -237,9 +237,9 @@ class Router
      *
      * @return string
      */
-    public function getNamespace(): string
+    public static function getNamespace(): string
     {
-        return $this->namespace;
+        return static::$namespace;
     }
 
 
@@ -249,19 +249,19 @@ class Router
      * @param [type] $callback
      * @return void
      */
-    public function run($callback = null)
+    public static function run($callback = null)
     {
-        $this->requestedMethod = $this->getRequestMethod();
-        if (isset($this->beforeRoutes[$this->requestedMethod])) {
-            $this->handle($this->beforeRoutes[$this->requestedMethod]);
+        static::$requestedMethod = self::getRequestMethod();
+        if (isset(static::$beforeRoutes[static::$requestedMethod])) {
+            self::handle(static::$beforeRoutes[static::$requestedMethod]);
         }
         $numHandled = 0;
-        if (isset($this->afterRoutes[$this->requestedMethod])) {
-            $numHandled = $this->handle($this->afterRoutes[$this->requestedMethod], true);
+        if (isset(static::$afterRoutes[static::$requestedMethod])) {
+            $numHandled = self::handle(static::$afterRoutes[static::$requestedMethod], true);
         }
         if ($numHandled === 0) {
-            if ($this->notFoundCallback) {
-                $this->invoke($this->notFoundCallback);
+            if (static::$notFoundCallback) {
+                self::invoke(static::$notFoundCallback);
             } else {
                 header($_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found');
             }
@@ -283,9 +283,9 @@ class Router
      * @param [type] $fn
      * @return void
      */
-    public function set404($fn): void
+    public static function set404($fn): void
     {
-        $this->notFoundCallback = $fn;
+        static::$notFoundCallback = $fn;
     }
 
 
@@ -296,10 +296,10 @@ class Router
      * @param boolean $quitAfterRun
      * @return void
      */
-    private function handle($routes, $quitAfterRun = false)
+    private static function handle($routes, $quitAfterRun = false)
     {
         $numHandled = 0;
-        $uri = $this->getCurrentUri();
+        $uri = self::getCurrentUri();
         foreach ($routes as $route) {
             $route['pattern'] = preg_replace('/\/{(.*?)}/', '/(.*?)', $route['pattern']);
             if (preg_match_all('#^' . $route['pattern'] . '$#', $uri, $matches, PREG_OFFSET_CAPTURE)) {
@@ -310,7 +310,7 @@ class Router
                     }
                     return isset($match[0][0]) ? trim($match[0][0], '/') : null;
                 }, $matches, array_keys($matches));
-                $this->invoke($route['fn'], $params);
+                self::invoke($route['fn'], $params);
                 ++$numHandled;
                 if ($quitAfterRun) {
                     break;
@@ -329,14 +329,17 @@ class Router
      * @param array $params
      * @return void
      */
-    private function invoke($fn, $params = []): void
+    private static function invoke($fn, $params = []): void
     {
         if (is_callable($fn)) {
-            call_user_func_array($fn, $params);
+            $function_result = call_user_func_array($fn, $params);
+            if($function_result instanceof Response){
+                echo $function_result->finalize();
+            }
         } elseif (stripos($fn, '@') !== false) {
             list($controller, $method) = explode('@', $fn);
-            if ($this->getNamespace() !== '') {
-                $controller = $this->getNamespace() . '\\' . $controller;
+            if (self::getNamespace() !== '') {
+                $controller = self::getNamespace() . '\\' . $controller;
             }
             if (class_exists($controller)) {
                 $additionnalparams = Resolver::resolveFunction($controller, $method);
@@ -359,9 +362,9 @@ class Router
      *
      * @return string
      */
-    public function getCurrentUri(): string
+    public static function getCurrentUri(): string
     {
-        $uri = substr(rawurldecode($_SERVER['REQUEST_URI']), strlen($this->getBasePath()));
+        $uri = substr(rawurldecode($_SERVER['REQUEST_URI']), strlen(self::getBasePath()));
         if (strstr($uri, '?')) {
             $uri = substr($uri, 0, strpos($uri, '?'));
         }
@@ -375,12 +378,12 @@ class Router
      *
      * @return void
      */
-    public function getBasePath()
+    public static function getBasePath()
     {
-        if ($this->serverBasePath === null) {
-            $this->serverBasePath = implode('/', array_slice(explode('/', $_SERVER['SCRIPT_NAME']), 0, -1)) . '/';
+        if (static::$serverBasePath === null) {
+            static::$serverBasePath = implode('/', array_slice(explode('/', $_SERVER['SCRIPT_NAME']), 0, -1)) . '/';
         }
-        return $this->serverBasePath;
+        return static::$serverBasePath;
     }
 
 
@@ -390,8 +393,8 @@ class Router
      * @param [type] $serverBasePath
      * @return void
      */
-    public function setBasePath($serverBasePath) : void
+    public static function setBasePath($serverBasePath) : void
     {
-        $this->serverBasePath = $serverBasePath;
+        static::$serverBasePath = $serverBasePath;
     }
 }

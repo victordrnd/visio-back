@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Core;
 
-class Singleton extends ConfReader
+class Environment extends ConfReader
 {
 
     public $cnx;
@@ -21,10 +21,10 @@ class Singleton extends ConfReader
         $this->cnx = new \PDO("mysql:host=$this->host;dbname=$this->dbname", $this->username, $this->password);
     }
 
-    public static function getInstance(): Singleton
+    public static function getInstance(): Environment
     {
         if (is_null(self::$instance)) {
-            self::$instance = new Singleton();
+            self::$instance = new Environment();
         }
         return self::$instance;
     }

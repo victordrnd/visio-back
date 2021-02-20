@@ -3,7 +3,7 @@
 namespace Http\Controllers;
 
 use Models\User;
-use Framwork\Core\Request;
+use Framwork\Core\Http\Request;
 use Framwork\Facades\Auth;
 
 class AuthController extends Controller

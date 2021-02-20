@@ -3,8 +3,7 @@
 namespace Http\Controllers;
 
 use Models\City;
-use Framework\Core\Request;
-use Framework\Core\Response;
+use Framework\Core\Http\Request;
 
 class CityController extends Controller
 {
@@ -21,7 +20,7 @@ class CityController extends Controller
     {
         $city = City::find($id)->with('country');
         return response()->json($city);
-        // echo Renderer::render('city/city.php', compact("city", 'country'));
+        
     }
 
     /**
@@ -33,22 +32,9 @@ class CityController extends Controller
     public function showFromContinent(string $continent)
     {
         $cities = City::findFromContinent($continent);
-        // echo Renderer::render('city/cities.php', compact("cities", "continent"));
     }
 
-    /**
-     * Search cities with name param
-     * @param string $name
-     * @return void
-     */
-    public function search(Request $req)
-    {
-        $keyword = $req->input('keyword');
-        $cities = City::where('Name','LIKE', "$keyword%")->get();
-        $caller = "search";
-        $name = $req->keyword;
-        // echo Renderer::render('city/cities.php', compact('cities', 'caller', 'name'));
-    }
+
 
     /**
      * Create a new City from form.
@@ -63,7 +49,7 @@ class CityController extends Controller
             'district' => $req->district,
             'population' => $req->population
         ]);
-        header('location:/city/show/'.$city->getCityId());
+        return response()->json($city);
     }
 
     /**
@@ -82,7 +68,7 @@ class CityController extends Controller
             'District' => $req->district,
             'Population' => $req->population
         ]);
-        header('location:/city/show/'.$city->getCityId());
+        return response()->json($city);
     }
 
 
@@ -95,21 +81,7 @@ class CityController extends Controller
     public function delete(int $id)
     {
         $city = City::find($id);
-        $country = $city->country();
         $city->remove();
-
-        header('location:/country/show/' . $country->Country_Id);
-    }
-
-
-
-    /**
-     * Display create city view
-     *
-     * @param string $countryCode
-     * @return void
-     */
-    public function createCityView(string $countryCode){
-        // echo Renderer::render('city/create.php', compact('countryCode'));
+        return response()->json(['success' => true]);
     }
 }

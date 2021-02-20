@@ -3,7 +3,7 @@
 
 namespace Framework\ORM;
 
-abstract class Relationship
+trait Relationship
 {
 
     /**
