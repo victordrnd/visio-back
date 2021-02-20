@@ -18,7 +18,7 @@ class CityController extends Controller
      */
     public function show(int $id)
     {
-        $city = City::where("City_Id", $id)->with('country')->last();
+        $city = City::where("City_Id", $id)->with('country')->get();
         return response()->json($city);
         
     }

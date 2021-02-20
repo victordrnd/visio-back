@@ -1,6 +1,7 @@
 <?php
 namespace Framework\ORM\Query;
 
+use Framework\Core\Collection;
 use Framework\Core\Environment;
 
 class BaseQuery{
@@ -120,7 +121,7 @@ class BaseQuery{
                 call_user_func_array(array($item, "with"), $this->with);
             }
         }
-        return $items;
+        return new Collection($items);
     }
 
 

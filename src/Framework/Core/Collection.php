@@ -4,7 +4,7 @@ namespace Framework\Core;
 
 use ArrayObject;
 
-class Collection extends ArrayObject {
+class Collection extends ArrayObject implements \JsonSerializable{
 
     protected $array = [];
 
@@ -32,9 +32,14 @@ class Collection extends ArrayObject {
     public function with(string ...$args) {
         foreach ($args as $arg) {
             foreach ($this->array as $element) {
-                $element->{$arg} = call_user_func(array($element, $arg));
+                $element->{$arg} = call_user_func_array(array($element, "with"), $args);
             }
         }
         return $this;
+    }
+
+
+    public function jsonSerialize(){
+        return $this->array;
     }
 }
