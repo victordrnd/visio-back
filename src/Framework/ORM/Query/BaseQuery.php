@@ -102,6 +102,11 @@ class BaseQuery{
         return $object;
     }
 
+    public function last(){
+        $this->ordersBy[] = new OrderByQuery($this->entity::$primaryKey, "DESC");
+        return $this->first();
+    }
+
 
     public function get(){
         $SQL = $this->build();

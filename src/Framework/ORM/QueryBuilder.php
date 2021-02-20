@@ -157,18 +157,18 @@ class QueryBuilder extends BaseQuery{
 
 
 
-    /**
-     * Return last inserted Object from calling class
-     *
-     * @return void
-     */
-    public static function last() {
-        $SQL = "SELECT * FROM " . static::$table . " ORDER BY " . static::$primaryKey . " DESC LIMIT 1";
-        $statement = Environment::getInstance()->cnx->prepare($SQL);
-        $statement->execute();
-        $object = $statement->fetchObject(get_called_class());
-        return $object;
-    }
+    // /**
+    //  * Return last inserted Object from calling class
+    //  *
+    //  * @return void
+    //  */
+    // public static function last() {
+    //     $SQL = "SELECT * FROM " . static::$table . " ORDER BY " . static::$primaryKey . " DESC LIMIT 1";
+    //     $statement = Environment::getInstance()->cnx->prepare($SQL);
+    //     $statement->execute();
+    //     $object = $statement->fetchObject(get_called_class());
+    //     return $object;
+    // }
 
 
     public function with(...$args) {

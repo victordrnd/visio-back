@@ -18,22 +18,10 @@ class CityController extends Controller
      */
     public function show(int $id)
     {
-        $city = City::where("City_Id", $id)->orderBy("CountryCode", "DESC")->orderBy("City_Id")->with('country')->get();
+        $city = City::where("City_Id", $id)->with('country')->last();
         return response()->json($city);
         
     }
-
-    /**
-     * Deprecated function 
-     *
-     * @param string $continent
-     * @return void
-     */
-    public function showFromContinent(string $continent)
-    {
-        $cities = City::findFromContinent($continent);
-    }
-
 
 
     /**
