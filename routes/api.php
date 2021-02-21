@@ -5,6 +5,7 @@ Router::group('/auth', function (){
     Router::post('/signin', 'AuthController@verifySignIn');
     Router::post('/register', 'AuthController@verifyRegister');
     Router::post('/login', 'AuthController@login');
+    Router::get('/current', 'AuthController@current');
 });
 
 

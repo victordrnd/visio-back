@@ -5,19 +5,25 @@ namespace Http\Controllers;
 use Models\User;
 use Framework\Core\Http\Request;
 use Framework\Facades\Auth;
+use Framework\Facades\JWT;
 
 class AuthController extends Controller {
 
     public function getAll() {
+        
         return response()->json(User::all());
     }
+
+    public function current(){
+        return response()->json(auth()->user());
+    }
+
 
     public function login(Request $req) {
         $credentials = $req->only('login', 'password');
         if (!$token = auth()->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-        
         $data =  [
             'user' => auth()->user(),
             'token' => $token

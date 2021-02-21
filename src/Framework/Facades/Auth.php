@@ -38,9 +38,11 @@ class Auth {
 
 
     public static function attempt(array $credentials) {
-        $user = User::where(User::getJWTIdentifier(), $credentials[0])->first();
-        if (!is_null($user)) {
-            if (Hash::check($credentials[1], $user->password)) {
+        if(count($credentials) < 2)
+            return false;
+            $user = User::where(User::getJWTIdentifier(), $credentials[0])->first();
+            if (!is_null($user)) {
+                if (Hash::check($credentials[1], $user->password)) {
                 static::$user = $user;
                 return JWT::encode(['sub' => $user->getPrimaryKeyValue(), "exp" => time() + (60 * 60 * 24 * 60)]);
             } else {
