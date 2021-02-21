@@ -5,6 +5,9 @@ Router::group('/auth', function (){
     Router::post('/signin', 'AuthController@verifySignIn');
     Router::post('/register', 'AuthController@verifyRegister');
 });
+Router::group(['prefix' => '/users', 'middleware' => 'auth:api'], function(){
+    Router::get("/", "AuthController@getAll");
+});
 
 
 

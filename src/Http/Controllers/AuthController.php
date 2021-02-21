@@ -3,13 +3,15 @@
 namespace Http\Controllers;
 
 use Models\User;
-use Framwork\Core\Http\Request;
-use Framwork\Facades\Auth;
+use Framework\Core\Http\Request;
+use Framework\Facades\Auth;
 
 class AuthController extends Controller
 {
 
-
+    public function getAll(){
+        return response()->json(User::all());
+    }
 
     public function verifySignIn(Request $req)
     {
@@ -30,7 +32,7 @@ class AuthController extends Controller
                 $user = User::create([
                     'nom' => $req->fullname,
                     'login' => $req->login,
-                    'password' => password_hash($req->password, PASSWORD_DEFAULT)
+                    'password' => Hash::make($req->password)
                 ]);
                 Auth::log($user);
                 exit();

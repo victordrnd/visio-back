@@ -29,10 +29,18 @@ class User extends Model
      */
     protected static $attributes = ['nom', 'login', 'password'];
     
-    
+    protected $hidden = ["password"]; 
 
     public function roles(){
         return $this->belongsToMany(Role::class, UserRole::class, 'role_id', 'user_id');
     }
+
+
+
+    public static function getJWTIdentifier() : string
+    {
+        return "login";
+    }
+
 
 }

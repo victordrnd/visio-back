@@ -145,30 +145,15 @@ class QueryBuilder extends BaseQuery{
      *
      * @return array
      */
-    public static function all(): array {
+    public static function all(): Collection {
         $SQL = "SELECT * FROM " . self::table();
         $statement = Environment::getInstance()->cnx->prepare($SQL);
         $statement->execute();
         $statement->setFetchMode(\PDO::FETCH_CLASS, get_called_class());
         $array = $statement->fetchAll();
-        return $array;
+        return new Collection($array);
     }
 
-
-
-
-    // /**
-    //  * Return last inserted Object from calling class
-    //  *
-    //  * @return void
-    //  */
-    // public static function last() {
-    //     $SQL = "SELECT * FROM " . static::$table . " ORDER BY " . static::$primaryKey . " DESC LIMIT 1";
-    //     $statement = Environment::getInstance()->cnx->prepare($SQL);
-    //     $statement->execute();
-    //     $object = $statement->fetchObject(get_called_class());
-    //     return $object;
-    // }
 
 
     public function with(...$args) {
@@ -200,6 +185,9 @@ class QueryBuilder extends BaseQuery{
 
 
     protected static function table($entity = null) {
-        return parent::table(get_called_class());
+        $entity = get_called_class();
+        if($entity::$table)
+            return $entity::$table;
+        return parent::table($entity);
     }
 }

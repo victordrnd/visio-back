@@ -1,40 +1,48 @@
 <?php
+
 namespace Framework\Facades;
 
+use Framework\Core\Exceptions\InvalidCredentialsException;
+use Framework\Core\Exceptions\InvalidTokenException;
+use Framework\Core\Exceptions\ModelNotFoundException;
+use Framework\Core\Http\HttpHeader;
 use Models\User;
 use Models\Permission;
 
-class Auth
-{
+class Auth {
 
+    public function check() {
+        return !is_null($this->user());
+    }
 
-
-
-    /**
-     * Verify if user have permission
-     *
-     * @param [type] $permission
-     * @return boolean
-     */
-    public static function has($permission): bool
-    {
-    
+    public static function user() {
+        $jwt_token = HttpHeader::getBearerToken();
+        if (!is_null($jwt_token)) {
+            try {
+                $payload = JWT::validate($jwt_token);
+            } catch (\Exception $e) {
+                throw $e;
+                return null;
+            }
+            return User::find($payload['sub']);
+        }
+        throw new InvalidTokenException();
+        return null;
     }
 
 
 
-    public static function attempt(array $credentials): bool
-    {
-        $user = User::where('login', $credentials[0])->with('roles')->first();
+    public static function attempt(array $credentials): mixed {
+        $user = User::where(User::getJWTIdentifier(), $credentials[0])->first();
         if (!is_null($user)) {
-            if (password_verify($credentials[1], $user->getPassword())) {
-                self::log($user);
-                return true;
+            if (Hash::check($credentials[1], $user->getPassword())) {
+                return JWT::encode(['sub' => $user->getPrimaryKeyValue(), "exp" => time() + (60 * 60 * 24 * 60)]);
             } else {
-                throw new \Exception("Le mot de passe saisis est incorrect");
+                throw new InvalidCredentialsException();
+                return false;
             }
         } else {
-            throw new \Exception("L'utilisateur n'existe pas");
+            return false;
         }
     }
 }

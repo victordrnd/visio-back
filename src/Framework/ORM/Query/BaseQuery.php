@@ -3,6 +3,7 @@ namespace Framework\ORM\Query;
 
 use Framework\Core\Collection;
 use Framework\Core\Environment;
+use Framework\Core\Exceptions\ModelNotFoundException;
 
 class BaseQuery{
 
@@ -99,6 +100,10 @@ class BaseQuery{
         static::$instance = null;
         if(!empty($this->with)){
             return call_user_func_array(array($object, "with"), $this->with);
+        }
+        if(is_null($object) || is_bool($object)){
+            throw new ModelNotFoundException();
+            return null;
         }
         return $object;
     }

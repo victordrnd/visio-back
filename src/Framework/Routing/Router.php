@@ -1,10 +1,12 @@
 <?php
+
 namespace Framework\Routing;
+
+use Exception;
 use Framework\Core\Resolver;
 use Framework\Core\Http\Response;
 
-class Router
-{
+class Router {
 
     private static $afterRoutes = [];
 
@@ -35,8 +37,7 @@ class Router
      * @param [type] $fn
      * @return void
      */
-    public static function before($methods, $pattern, \Closure $fn) : void
-    {
+    public static function before($methods, $pattern, \Closure $fn): void {
         $pattern = static::$baseRoute . '/' . trim($pattern, '/');
         $pattern = static::$baseRoute ? rtrim($pattern, '/') : $pattern;
 
@@ -57,8 +58,7 @@ class Router
      * @param [type] $fn
      * @return void
      */
-    public static function match($methods, $pattern, $fn) : void
-    {
+    public static function match($methods, $pattern, $fn): void {
         $pattern = static::$baseRoute . '/' . trim($pattern, '/');
         $pattern = static::$baseRoute ? rtrim($pattern, '/') : $pattern;
         foreach (explode('|', $methods) as $method) {
@@ -77,8 +77,7 @@ class Router
      * @param [type] $fn
      * @return void
      */
-    public static function all($pattern,  $fn) : void
-    {
+    public static function all($pattern,  $fn): void {
         self::match('GET|POST|PUT|DELETE|OPTIONS|PATCH|HEAD', $pattern, $fn);
     }
 
@@ -90,8 +89,7 @@ class Router
      * @param [type] $fn
      * @return void
      */
-    public static function get($pattern, $fn) : void
-    {
+    public static function get($pattern, $fn): void {
         self::match('GET', $pattern, $fn);
     }
 
@@ -103,8 +101,7 @@ class Router
      * @param [type] $fn
      * @return void
      */
-    public static function post($pattern, $fn) :void
-    {
+    public static function post($pattern, $fn): void {
         self::match('POST', $pattern, $fn);
     }
 
@@ -116,8 +113,7 @@ class Router
      * @param [type] $fn
      * @return void
      */
-    public static function patch($pattern, \Closure $fn) :void
-    {
+    public static function patch($pattern, \Closure $fn): void {
         self::match('PATCH', $pattern, $fn);
     }
 
@@ -129,8 +125,7 @@ class Router
      * @param [type] $fn
      * @return void
      */
-    public static function delete($pattern, $fn) :void
-    {
+    public static function delete($pattern, $fn): void {
         self::match('DELETE', $pattern, $fn);
     }
 
@@ -142,8 +137,7 @@ class Router
      * @param [type] $fn
      * @return void
      */
-    public static function put($pattern, $fn) :void
-    {
+    public static function put($pattern, $fn): void {
         self::match('PUT', $pattern, $fn);
     }
 
@@ -155,8 +149,7 @@ class Router
      * @param [type] $fn
      * @return void
      */
-    public static function options($pattern, $fn) :void
-    {
+    public static function options($pattern, $fn): void {
         self::match('OPTIONS', $pattern, $fn);
     }
 
@@ -168,12 +161,23 @@ class Router
      * @param callback $fn
      * @return void
      */
-    public static function group(string $baseRoute, \Closure $fn)
-    {
-        $curBaseRoute = static::$baseRoute;
-        static::$baseRoute .= $baseRoute;
-        call_user_func($fn);
-        static::$baseRoute = $curBaseRoute;
+    public static function group($baseRoute, \Closure $fn) {
+        if (is_string($baseRoute)) {
+            $curBaseRoute = static::$baseRoute;
+            static::$baseRoute .= $baseRoute;
+            call_user_func($fn);
+            static::$baseRoute = $curBaseRoute;
+        } elseif (is_array($baseRoute)) {
+            if (isset($baseRoute['prefix'])) {
+                self::group($baseRoute['prefix'], $fn);
+                if (isset($baseRoute['middleware'])) {
+                    self::before('GET|POST|PUT|DELETE|OPTIONS|PATCH|HEAD', $baseRoute['prefix'].".*", function() use ($baseRoute){
+                        $middlewares = include $_SERVER['DOCUMENT_ROOT'] . "/config/middlewares.php";
+                        self::call_class_function($middlewares[$baseRoute["middleware"]], "handle");
+                    });
+                }
+            }
+        }
     }
 
 
@@ -182,8 +186,7 @@ class Router
      *
      * @return void
      */
-    public static function getRequestHeaders()
-    {
+    public static function getRequestHeaders() {
         $headers = [];
         if (function_exists('getallheaders')) {
             $headers = getallheaders();
@@ -204,8 +207,7 @@ class Router
      *
      * @return string
      */
-    public static function getRequestMethod(): string
-    {
+    public static function getRequestMethod(): string {
         $method = $_SERVER['REQUEST_METHOD'];
         if ($_SERVER['REQUEST_METHOD'] == 'HEAD') {
             ob_start();
@@ -225,8 +227,7 @@ class Router
      * @param [type] $namespace
      * @return void
      */
-    public static function setNamespace(string $namespace)
-    {
+    public static function setNamespace(string $namespace) {
         if (is_string($namespace)) {
             static::$namespace = $namespace;
         }
@@ -237,8 +238,7 @@ class Router
      *
      * @return string
      */
-    public static function getNamespace(): string
-    {
+    public static function getNamespace(): string {
         return static::$namespace;
     }
 
@@ -249,8 +249,7 @@ class Router
      * @param [type] $callback
      * @return void
      */
-    public static function run($callback = null)
-    {
+    public static function run($callback = null) {
         static::$requestedMethod = self::getRequestMethod();
         if (isset(static::$beforeRoutes[static::$requestedMethod])) {
             self::handle(static::$beforeRoutes[static::$requestedMethod]);
@@ -283,8 +282,7 @@ class Router
      * @param [type] $fn
      * @return void
      */
-    public static function set404($fn): void
-    {
+    public static function set404($fn): void {
         static::$notFoundCallback = $fn;
     }
 
@@ -296,8 +294,7 @@ class Router
      * @param boolean $quitAfterRun
      * @return void
      */
-    private static function handle($routes, $quitAfterRun = false)
-    {
+    private static function handle($routes, $quitAfterRun = false) {
         $numHandled = 0;
         $uri = self::getCurrentUri();
         foreach ($routes as $route) {
@@ -329,11 +326,10 @@ class Router
      * @param array $params
      * @return void
      */
-    private static function invoke($fn, $params = []): void
-    {
+    private static function invoke($fn, $params = []): void {
         if (is_callable($fn)) {
             $function_result = call_user_func_array($fn, $params);
-            if($function_result instanceof Response){
+            if ($function_result instanceof Response) {
                 echo $function_result->finalize();
             }
         } elseif (stripos($fn, '@') !== false) {
@@ -342,17 +338,26 @@ class Router
                 $controller = self::getNamespace() . '\\' . $controller;
             }
             if (class_exists($controller)) {
-                $additionnalparams = Resolver::resolveFunction($controller, $method);
-                $params = array_merge($additionnalparams, $params);
-                $function_result = call_user_func_array([Resolver::resolve($controller), $method], $params);
-                if ( $function_result === false) {
-                    if ($function_result = forward_static_call_array([$controller, $method], $params) === false);
-                }
-                //var_dump($function_result);
-                if($function_result instanceof Response){
-                    echo $function_result->finalize();
-                }
+                self::call_class_function($controller, $method, $params);
             }
+        }
+    }
+
+    private static function call_class_function($class, $method, $params = []) {
+        $additionnalparams = Resolver::resolveFunction($class, $method);
+        $params = array_merge($additionnalparams, $params);
+        try{
+            $function_result = call_user_func_array([Resolver::resolve($class), $method], $params);
+            if ($function_result === false) {
+                if ($function_result = forward_static_call_array([$class, $method], $params) === false);
+            }
+            if ($function_result instanceof Response) {
+                echo $function_result->finalize();
+                die;
+            }
+        }catch(\Exception $e){
+            echo response()->json(['error' => $e->getMessage()],$e->getCode())->finalize();
+            die;
         }
     }
 
@@ -362,8 +367,7 @@ class Router
      *
      * @return string
      */
-    public static function getCurrentUri(): string
-    {
+    public static function getCurrentUri(): string {
         $uri = substr(rawurldecode($_SERVER['REQUEST_URI']), strlen(self::getBasePath()));
         if (strstr($uri, '?')) {
             $uri = substr($uri, 0, strpos($uri, '?'));
@@ -378,8 +382,7 @@ class Router
      *
      * @return void
      */
-    public static function getBasePath()
-    {
+    public static function getBasePath() {
         if (static::$serverBasePath === null) {
             static::$serverBasePath = implode('/', array_slice(explode('/', $_SERVER['SCRIPT_NAME']), 0, -1)) . '/';
         }
@@ -393,8 +396,7 @@ class Router
      * @param [type] $serverBasePath
      * @return void
      */
-    public static function setBasePath($serverBasePath) : void
-    {
+    public static function setBasePath($serverBasePath): void {
         static::$serverBasePath = $serverBasePath;
     }
 }

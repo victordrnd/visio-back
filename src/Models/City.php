@@ -4,11 +4,7 @@ namespace Models;
 
 use Framework\Core\Model;
 
-class City extends Model{
-
-   //protected static $table = "city";
-   
-   
+class City extends Model{   
    /**
     * Table primary key
     *

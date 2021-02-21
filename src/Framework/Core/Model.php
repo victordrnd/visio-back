@@ -6,7 +6,6 @@ use Framework\ORM\QueryBuilder;
 
 abstract class Model extends QueryBuilder implements \JsonSerializable {
     
-    protected static $table = "";
     
     protected static $primaryKey = "id";
 
