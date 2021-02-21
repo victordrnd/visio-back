@@ -98,12 +98,11 @@ class BaseQuery{
         $statement->execute($this->values_bindings);
         $object =  $statement->fetchObject($this->entity);
         static::$instance = null;
+        if(is_null($object) || is_bool($object)){
+            return null;
+        }
         if(!empty($this->with)){
             return call_user_func_array(array($object, "with"), $this->with);
-        }
-        if(is_null($object) || is_bool($object)){
-            throw new ModelNotFoundException();
-            return null;
         }
         return $object;
     }
@@ -191,7 +190,10 @@ class BaseQuery{
     }
 
     protected static function table($entity) {
-
+        if(is_string($entity) || is_object($entity)){
+            if(isset($entity::$table))
+                return $entity::$table;
+        }
         $class_path = explode("\\", $entity);
         $table_name = strtolower(array_pop($class_path));
         return $table_name;

@@ -11,8 +11,13 @@ use Models\Permission;
 
 class Auth {
 
+    private static $user = null;
     public function check() {
-        return !is_null($this->user());
+        if(!is_null(self::user())){
+            return true;
+        }
+        throw new InvalidTokenException();
+        return false;
     }
 
     public static function user() {
@@ -24,18 +29,19 @@ class Auth {
                 throw $e;
                 return null;
             }
-            return User::find($payload['sub']);
+
+            return User::find($payload->sub);
         }
-        throw new InvalidTokenException();
-        return null;
+        return static::$user;
     }
 
 
 
-    public static function attempt(array $credentials): mixed {
+    public static function attempt(array $credentials) {
         $user = User::where(User::getJWTIdentifier(), $credentials[0])->first();
         if (!is_null($user)) {
-            if (Hash::check($credentials[1], $user->getPassword())) {
+            if (Hash::check($credentials[1], $user->password)) {
+                static::$user = $user;
                 return JWT::encode(['sub' => $user->getPrimaryKeyValue(), "exp" => time() + (60 * 60 * 24 * 60)]);
             } else {
                 throw new InvalidCredentialsException();

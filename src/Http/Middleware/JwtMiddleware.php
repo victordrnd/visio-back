@@ -13,14 +13,13 @@ class JwtMiddleware extends Middleware{
     public function handle(Request $req, $next = null){
 
         try{
-            $user = Auth::user();
-            var_dump($user);
+            if(Auth::check()){
+                return true;    
+            };
         }catch(\Exception $e){
             throw $e;
             return response()->json(['error' => $e->getMessage()], 401);
         }
-        return true;
-
     }
 
 

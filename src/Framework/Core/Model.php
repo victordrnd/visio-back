@@ -24,7 +24,7 @@ abstract class Model extends QueryBuilder implements \JsonSerializable {
         $this->model_properties[$name] = $value;
     }
     
-    protected function getPrimaryKeyValue()
+    public function getPrimaryKeyValue()
     {
         return $this->{static::$primaryKey};
     }

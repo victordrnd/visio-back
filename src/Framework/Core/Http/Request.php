@@ -2,28 +2,24 @@
 
 namespace Framework\Core\Http;
 
-class Request
-{
+class Request {
 
     public $url;
 
     public $params = [];
 
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->extractInputs();
         $this->extractHeader();
     }
 
 
-    public function all()
-    {
+    public function all() {
         return $this->params;
     }
 
-    public function only(string ...$params)
-    {
+    public function only(string ...$params) {
         $data = [];
         foreach ($params as $param) {
             if ($this->has($param)) {
@@ -34,40 +30,35 @@ class Request
     }
 
 
-    public function input(string $input)
-    {
+    public function input(string $input) {
         return $this->{$input};
     }
 
 
-    public function has(string $input)
-    {
+    public function has(string $input) {
         return isset($this->{$input});
     }
 
 
-    private function extractInputs()
-    {
-        $data = file_get_contents("php://input");
-        parse_str($data, $this->params);
-        foreach ($this->params as $param => &$value) {
-            if (!is_array($this->params)) {
-                $value = htmlspecialchars($value);
+    private function extractInputs() {
+        if (isset($_SERVER['QUERY_STRING'])) {
+            $data = $_SERVER['QUERY_STRING'];
+            parse_str($data, $this->params);
+            foreach ($this->params as $param => &$value) {
+                if (!is_array($this->params)) {
+                    $value = htmlspecialchars($value);
+                }
+                $this->{$param} = $value;
             }
-            $this->{$param} = $value;
         }
     }
 
-    private function extractHeader()
-    {
+    private function extractHeader() {
         $this->url = $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
     }
 
 
-    public function __get($property)
-    {
+    public function __get($property) {
         return $this->params[$property];
     }
 }
-
-

@@ -35,26 +35,26 @@ class JWT {
     }
 
 
-    public static function validate($jwt_token): mixed {
-        $parts = explode('.', $jwt);
+    public static function validate($jwt_token) {
+        $env = Environment::getInstance();
+        $secret = $env->getConfigValue("JWT_SECRET");
+        $parts = explode('.', $jwt_token);
         $header = base64_decode($parts[0]);
         $payload = base64_decode($parts[1]);
         $signatureProvided = $parts[2];
-
-        //TODO check for expiration
-        if($payload->exp <= time()){
+        $decoded_payload = json_decode($payload);
+        if($decoded_payload->exp <= time()){
             throw new ExpiredTokenException();
             return false;
         }
 
-        $base64UrlHeader = base64UrlEncode($header);
-        $base64UrlPayload = base64UrlEncode($payload);
-        $signature = hash_hmac('sha256', $base64UrlHeader . "." . $base64UrlPayload, $secret, true);
-        $base64UrlSignature = base64UrlEncode($signature);
-
+        $base64UrlHeader = self::base64UrlEncode($header);
+        $base64UrlPayload = self::base64UrlEncode($payload);
+        $signature = hash_hmac('sha512', $base64UrlHeader . "." . $base64UrlPayload, $secret, true);
+        $base64UrlSignature = self::base64UrlEncode($signature);
 
         if($base64UrlSignature === $signatureProvided)
-            return $payload;
+            return $decoded_payload;
         throw new InvalidTokenException();  
         return false;
     }

@@ -1,8 +1,9 @@
 
 <?php
 use Framework\Core\Http\Response;
+use Framework\Facades\Auth;
 use Framework\Routing\Router;
-
+header('Content-Type: application/json');
 /*
 |--------------------------------------------------------------------------
 | Register The Auto Loader
@@ -31,6 +32,10 @@ Router::run();
 
 function response() {
     return new Response();
+}
+
+function auth(){
+    return new Auth();
 }
 
 ?>
