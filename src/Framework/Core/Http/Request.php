@@ -2,6 +2,9 @@
 
 namespace Framework\Core\Http;
 
+use Framework\Core\Exceptions\UnknowValidationRule;
+use Framework\Core\Exceptions\UnknowValidationRuleException;
+
 class Request {
 
     public $url;
@@ -60,5 +63,50 @@ class Request {
 
     public function __get($property) {
         return $this->params[$property];
+    }
+
+    public function rules(){
+        return [];
+    }
+
+
+    public function validate(){
+        $rules = $this->rules();
+        $errors = [];
+        foreach($rules as $input => $rule_array){
+            foreach($rule_array as $rule){
+                switch (trim($rule)) {
+                    case 'required':
+                        if (!isset($this->{$input}))
+                            $errors[] = "input $rule is required";
+                    case "string":
+                        if(isset($this->{$input})){
+                            if(!is_string($this->{$input}))
+                                $errors[] = "input $rule must be a string";
+                        }
+                    case "integer" :
+                        if(isset($this->{$input})){
+                            if(!is_integer($this->{$input}))
+                                $errors[] = "input $rule must be an integer";
+                        }
+                    case "numeric" :
+                        if(isset($this->{$input})){
+                            if(!is_numeric($this->{$input}))
+                                $errors[] = "input $rule must be a numeric value";
+                        }
+                    case "array":
+                        if(isset($this->{$input})){
+                            if(!is_array($this->{$input}))
+                                $errors[] = "input $rule must be an array";
+                        }
+                    default:
+                        throw new UnknowValidationRuleException("Unknow rule $rule",401, null);
+                        return false; 
+                }
+            }    
+        }
+        if(count($errors) > 0)
+            return $errors;
+        return true;
     }
 }

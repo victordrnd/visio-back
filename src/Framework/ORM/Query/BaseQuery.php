@@ -31,6 +31,8 @@ class BaseQuery{
     private $groupsBy = [];
     
     private $limit = -1;
+    private $offset = -1;
+
     private $with = [];
 
     private $table = "";
@@ -129,6 +131,12 @@ class BaseQuery{
     }
 
 
+    public function paginate(int $per_page = 15, int $page = 1){
+        $this->limit = $per_page;
+        $this->offset = ($page - 1 ) * $per_page;
+        return $this->get(); 
+    }
+
     public static function count(){
         $instance = self::get_instance(get_called_class());
         $instance->selects = ["COUNT(*) as count"];
@@ -185,6 +193,10 @@ class BaseQuery{
         if($this->limit > 0)
             $SQL .= " LIMIT ".$this->limit;
 
+        if($this->offset > 0)
+            $SQL .= " OFFSET ".$this->offset;
+
+        
         $SQL.= ";";
         return $SQL;
     }

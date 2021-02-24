@@ -3,6 +3,7 @@
 namespace Framework\Routing;
 
 use Exception;
+use Framework\Core\Http\Request;
 use Framework\Core\Resolver;
 use Framework\Core\Http\Response;
 
@@ -346,6 +347,15 @@ class Router {
     private static function call_class_function($class, $method, $params = []) {
         $additionnalparams = Resolver::resolveFunction($class, $method);
         $params = array_merge($additionnalparams, $params);
+        foreach($params as $param){
+            if($param instanceof Request){
+                $errors = $param->validate();
+                if(is_array($errors)){
+                    echo response()->json(['errors' => $errors], 401);die;
+                }
+                break;
+            }
+        }
         try{
             $function_result = call_user_func_array([Resolver::resolve($class), $method], $params);
             if ($function_result === false) {
