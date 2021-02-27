@@ -68,9 +68,15 @@ class BaseQuery{
         return $this;
     }
 
-    public static function limit($count){
+    public static function limit(int $count){
         $instance = self::get_instance(get_called_class());
         $instance->limit = $count;
+        return $instance;
+    }
+
+    public static function offset(int $offset){
+        $instance = self::get_instance(get_called_class());
+        $instance->offset = $offset;
         return $instance;
     }
 

@@ -28,26 +28,6 @@ class Role extends Model{
     protected static $attributes = [
         'user_id', 'libelle', 'permissions'
     ];
-
-
-
-    public function getRoleId(){
-        return $this->role_id;
-    }
-
-    public function getLibelle(){
-        return $this->libelle;
-    }
-
-    public function getPermissions(){
-        return $this->permissions;
-    }
-
-
-    public function setPermissions($permissions){
-        $this->permissions = $permissions;
-    }
-
 }
 
 

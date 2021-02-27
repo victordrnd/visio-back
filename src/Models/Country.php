@@ -7,9 +7,6 @@ use Framework\Core\Model;
 class Country extends Model
 {
 
-
-
-
    /**
     * Table primary key
     *
