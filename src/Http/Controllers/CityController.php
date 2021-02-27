@@ -4,6 +4,7 @@ namespace Http\Controllers;
 
 use Models\City;
 use Framework\Core\Http\Request;
+use Http\Requests\ShowCityRequest;
 
 class CityController extends Controller
 {

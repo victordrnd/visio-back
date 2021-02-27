@@ -351,7 +351,7 @@ class Router {
             if($param instanceof Request){
                 $errors = $param->validate();
                 if(is_array($errors)){
-                    echo response()->json(['errors' => $errors], 401);die;
+                    echo response()->json(['errors' => $errors], 401)->finalize();die;
                 }
                 break;
             }

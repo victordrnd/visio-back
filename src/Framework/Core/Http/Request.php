@@ -78,27 +78,32 @@ class Request {
                 switch (trim($rule)) {
                     case 'required':
                         if (!isset($this->{$input}))
-                            $errors[] = "input $rule is required";
+                            $errors[$input][] = "field $input is required";
+                    break;
                     case "string":
                         if(isset($this->{$input})){
                             if(!is_string($this->{$input}))
-                                $errors[] = "input $rule must be a string";
+                                $errors[$input][] = "field $input must be a string";
                         }
+                    break;
                     case "integer" :
                         if(isset($this->{$input})){
-                            if(!is_integer($this->{$input}))
-                                $errors[] = "input $rule must be an integer";
+                            if(!ctype_digit($this->{$input}))
+                                $errors[$input][] = "field $input must be an integer";
                         }
+                    break;
                     case "numeric" :
                         if(isset($this->{$input})){
                             if(!is_numeric($this->{$input}))
-                                $errors[] = "input $rule must be a numeric value";
+                                $errors[$input][] = "field $input must be a numeric value";
                         }
+                    break;
                     case "array":
                         if(isset($this->{$input})){
                             if(!is_array($this->{$input}))
-                                $errors[] = "input $rule must be an array";
+                                $errors[$input][] = "field $input must be an array";
                         }
+                    break;
                     default:
                         throw new UnknowValidationRuleException("Unknow rule $rule",401, null);
                         return false; 
