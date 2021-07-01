@@ -19,9 +19,8 @@ class CityController extends Controller
      */
     public function show(int $id)
     {
-        $city = City::where("City_Id", $id)->with('country')->get();
-        return response()->json($city);
-        
+        $city = City::where("City_Id", $id)->with('country', 'country.languages')->first();
+        return $city;
     }
 
 
@@ -34,7 +33,7 @@ class CityController extends Controller
     public function create(Request $req){
         $city = City::create([
             'name' => $req->name,
-            'countrycode' => $req->countrycode,
+            'CountryCode' => $req->countrycode,
             'district' => $req->district,
             'population' => $req->population
         ]);

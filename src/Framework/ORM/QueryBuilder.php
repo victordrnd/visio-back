@@ -110,34 +110,34 @@ class QueryBuilder extends BaseQuery{
      * @param array $columns
      * @return void
      */
-    public function update(array $columns): void {
-        if ($this->getPrimaryKeyValue() == 0) {
-            $this->save();
-        } else {
-            $class = new \ReflectionClass(get_called_class());
-            $SQL = "UPDATE " . self::table() . " SET ";
-            $last_key = end(array_keys($columns));
-            foreach ($columns as $key => $value) {
-                if ($key != $last_key) {
-                    $SQL .= "$key = ?, ";
-                } else {
-                    $SQL .= "$key = ? ";
-                }
-                if ($class->hasProperty($key)) {
-                    $this->{$key} = $value;
-                }
-            }
-            $SQL .= "WHERE " . static::$primaryKey . " = ?";
-            $values = array_values($columns);
-            foreach ($values as &$value) {
-                $value = htmlspecialchars($value);
-            }
-            $id = $this->getPrimaryKeyValue();
-            $values[] = $id;
-            $statement = Environment::getInstance()->cnx->prepare($SQL);
-            $statement->execute($values);
-        }
-    }
+    // public function update(array $columns): void {
+    //     if ($this->getPrimaryKeyValue() == 0) {
+    //         $this->save();
+    //     } else {
+    //         $class = new \ReflectionClass(get_called_class());
+    //         $SQL = "UPDATE " . self::table() . " SET ";
+    //         $last_key = end(array_keys($columns));
+    //         foreach ($columns as $key => $value) {
+    //             if ($key != $last_key) {
+    //                 $SQL .= "$key = ?, ";
+    //             } else {
+    //                 $SQL .= "$key = ? ";
+    //             }
+    //             if ($class->hasProperty($key)) {
+    //                 $this->{$key} = $value;
+    //             }
+    //         }
+    //         $SQL .= "WHERE " . static::$primaryKey . " = ?";
+    //         $values = array_values($columns);
+    //         foreach ($values as &$value) {
+    //             $value = htmlspecialchars($value);
+    //         }
+    //         $id = $this->getPrimaryKeyValue();
+    //         $values[] = $id;
+    //         $statement = Environment::getInstance()->cnx->prepare($SQL);
+    //         $statement->execute($values);
+    //     }
+    // }
 
 
     /**
@@ -159,25 +159,19 @@ class QueryBuilder extends BaseQuery{
     public function with(...$args) {
         $relationship_index = -1;
         foreach ($args as $index => $arg) {
-            if (strpos($arg, ".") !== false) {
-                $relationship_index = $index;
-                break; 
-            }
-            $this->{$arg} = call_user_func(array($this, $arg));
-        }
-        if($relationship_index != -1){
-            $nested_relationships = [];
-            $args = array_slice($args, $relationship_index);
-            foreach($args as &$arg){
-                $point_index = strpos($arg, ".");
-                $prefix = explode(".",$arg)[0];
-                $arg = substr($arg, $point_index+1);
-                $nested_relationships[$prefix][] = $arg;
+            $nested_relationships = []; 
+            $relations = explode(".", $arg);
+            foreach($relations as $index => $relation){
+                if($index != 0){
+                    $parent = $relations[$index-1];
+                    $nested_relationships[$parent][] = $relation;
+                }else{
+                    $this->{$relation} = call_user_func(array($this, $relation));
+                }
             }
             foreach($nested_relationships as $nested_key => $nested_value){
                 call_user_func_array(array($this->{$nested_key}, "with"), $nested_value);
             }
-
         }
         return $this;
     }
