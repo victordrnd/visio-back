@@ -7,6 +7,11 @@ class Response {
     private $status_code  = 200;
     private $content = null;
     private $headers = [];
+    
+    
+    public function __construct($content = null){
+        $this->json($content);
+    }
 
     public function json($content, $code = 200, $headers = []) {
         $this->content = json_encode($content);

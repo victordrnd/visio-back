@@ -364,6 +364,9 @@ class Router {
             if ($function_result instanceof Response) {
                 echo $function_result->finalize();
                 die;
+            }else{
+                echo (new Response($function_result))->finalize();
+                die;
             }
         }catch(\Exception $e){
             echo response()->json(['error' => $e->getMessage()],$e->getCode())->finalize();
