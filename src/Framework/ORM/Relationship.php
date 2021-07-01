@@ -29,9 +29,9 @@ trait Relationship
      * @param string $foreign_key -> Country -> Code
      * @return void
      */
-    protected function belongsTo($entity, string $localkey, string $foreign_key)
+    protected function belongsTo($entity, string $local_key, string $related_key = "id")
     {
-        return $entity::where($foreign_key, $this->{$localkey})->first();
+        return $entity::where($related_key, $this->{$local_key})->first();
     }
 
 
