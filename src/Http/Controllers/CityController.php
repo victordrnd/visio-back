@@ -19,13 +19,8 @@ class CityController extends Controller
      */
     public function show(int $id)
     {
-        //$city = City::where("City_Id", $id)->with('country', 'country.languages')->first();
-        $city = City::create([
-            'Name' => 'Victor',
-            'CountryCode' => "FRA",
-            'District' => 'Rhone',
-            'Population' => "18000"
-        ]);
+        $city = City::where("City_Id", $id)->with('country', 'country.languages')->first();
+       
         return $city;
     }
 
