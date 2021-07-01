@@ -5,6 +5,7 @@ namespace Framework\ORM;
 use Framework\Core\Environment;
 use Framework\ORM\Relationship;
 use Framework\Core\Collection;
+use Framework\Core\Exceptions\RelationNotFoundException;
 use Framework\ORM\Query\BaseQuery;
 
 class QueryBuilder extends BaseQuery {
@@ -147,7 +148,11 @@ class QueryBuilder extends BaseQuery {
                     $parent = $relations[$index - 1];
                     $nested_relationships[$parent][] = $relation;
                 } else {
-                    $this->{$relation} = call_user_func(array($this, $relation));
+                    if(method_exists($this, $relation)){
+                        $this->{$relation} = call_user_func(array($this, $relation));
+                    }else{
+                        throw new RelationNotFoundException($relation, get_class($this));
+                    }
                 }
             }
             foreach ($nested_relationships as $nested_key => $nested_value) {

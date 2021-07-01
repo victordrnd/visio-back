@@ -369,7 +369,7 @@ class Router {
                 die;
             }
         }catch(\Exception $e){
-            echo response()->json(['error' => $e->getMessage()],$e->getCode())->finalize();
+            echo response()->json(['title' => get_class($e), 'error' => $e->getMessage()],$e->getCode())->finalize();
             die;
         }
     }

@@ -12,14 +12,13 @@ class CityController extends Controller
 
     /**
      * Display city with specified id
-     * $req (inutile ici) est directement injecté par le router qui fait appele au Resolver de function 
      * 
      * @param int $id
      * @return void
      */
     public function show(int $id)
     {
-        $city = City::where("City_Id", $id)->with('country', 'country.languages')->first();
+        $city = City::where("City_Id", $id)->with('country.capital')->first();
        
         return $city;
     }
