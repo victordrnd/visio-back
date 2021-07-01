@@ -71,6 +71,15 @@ class BaseQuery {
         }
     }
 
+
+    public function delete(){
+        $instance = self::get_instance(get_called_class());
+        $instance->type = QueryType::DELETE;
+        $instance->build();
+        $statement = Environment::getInstance()->cnx->prepare($instance->SQL);
+        return $statement->execute($instance->values_bindings);
+    }
+
     public static function where($column, $operator = "=", $value = null) {
         $instance = self::get_instance(get_called_class());
         if (is_null($value)) {
@@ -131,7 +140,7 @@ class BaseQuery {
         $object =  $statement->fetchObject($this->entity);
         static::$instance = null;
         if (is_null($object) || is_bool($object)) {
-            return null;
+            throw new ModelNotFoundException;
         }
         if (!empty($this->with)) {
             return call_user_func_array(array($object, "with"), $this->with);
@@ -186,6 +195,9 @@ class BaseQuery {
             case QueryType::UPDATE:
                 $this->buildUpdate();
                 break;
+            case QueryType::DELETE:
+                $this->buildDelete();
+                break;
         }
         $this->SQL .= ";";
     }
@@ -231,6 +243,12 @@ class BaseQuery {
     private function buildUpdate() {
         $this->SQL = "UPDATE " . $this->table;
         $this->buildUpdateSet();
+        $this->buildWhere();
+    }
+
+    private function buildDelete(){
+        $this->SQL = "DELETE ";
+        $this->buildFrom();
         $this->buildWhere();
     }
 

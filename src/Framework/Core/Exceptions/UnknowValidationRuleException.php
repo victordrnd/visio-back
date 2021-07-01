@@ -3,7 +3,7 @@ namespace Framework\Core\Exceptions;
 
 use Throwable;
 
-class UnknowValidationRuleException extends \Exception{
+class UnknowValidationRuleException extends Exception{
     protected $message = "Unknow validation rule";
     protected $code = 401;
 

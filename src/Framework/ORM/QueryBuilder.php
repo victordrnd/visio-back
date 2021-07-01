@@ -6,7 +6,8 @@ use Framework\Core\Environment;
 use Framework\ORM\Relationship;
 use Framework\Core\Collection;
 use Framework\ORM\Query\BaseQuery;
-class QueryBuilder extends BaseQuery{
+
+class QueryBuilder extends BaseQuery {
     use Relationship;
 
     /**
@@ -110,34 +111,14 @@ class QueryBuilder extends BaseQuery{
      * @param array $columns
      * @return void
      */
-    // public function update(array $columns): void {
-    //     if ($this->getPrimaryKeyValue() == 0) {
-    //         $this->save();
-    //     } else {
-    //         $class = new \ReflectionClass(get_called_class());
-    //         $SQL = "UPDATE " . self::table() . " SET ";
-    //         $last_key = end(array_keys($columns));
-    //         foreach ($columns as $key => $value) {
-    //             if ($key != $last_key) {
-    //                 $SQL .= "$key = ?, ";
-    //             } else {
-    //                 $SQL .= "$key = ? ";
-    //             }
-    //             if ($class->hasProperty($key)) {
-    //                 $this->{$key} = $value;
-    //             }
-    //         }
-    //         $SQL .= "WHERE " . static::$primaryKey . " = ?";
-    //         $values = array_values($columns);
-    //         foreach ($values as &$value) {
-    //             $value = htmlspecialchars($value);
-    //         }
-    //         $id = $this->getPrimaryKeyValue();
-    //         $values[] = $id;
-    //         $statement = Environment::getInstance()->cnx->prepare($SQL);
-    //         $statement->execute($values);
-    //     }
-    // }
+    public function fill(array $columns): void {
+        $class = new \ReflectionClass(get_called_class());
+        foreach ($columns as $key => $value) {
+            if ($class->hasProperty($key)) {
+                $this->{$key} = $value;
+            }
+        }
+    }
 
 
     /**
@@ -159,17 +140,17 @@ class QueryBuilder extends BaseQuery{
     public function with(...$args) {
         $relationship_index = -1;
         foreach ($args as $index => $arg) {
-            $nested_relationships = []; 
+            $nested_relationships = [];
             $relations = explode(".", $arg);
-            foreach($relations as $index => $relation){
-                if($index != 0){
-                    $parent = $relations[$index-1];
+            foreach ($relations as $index => $relation) {
+                if ($index != 0) {
+                    $parent = $relations[$index - 1];
                     $nested_relationships[$parent][] = $relation;
-                }else{
+                } else {
                     $this->{$relation} = call_user_func(array($this, $relation));
                 }
             }
-            foreach($nested_relationships as $nested_key => $nested_value){
+            foreach ($nested_relationships as $nested_key => $nested_value) {
                 call_user_func_array(array($this->{$nested_key}, "with"), $nested_value);
             }
         }
@@ -180,7 +161,7 @@ class QueryBuilder extends BaseQuery{
 
     protected static function table($entity = null) {
         $entity = get_called_class();
-        if($entity::$table)
+        if ($entity::$table)
             return $entity::$table;
         return parent::table($entity);
     }
