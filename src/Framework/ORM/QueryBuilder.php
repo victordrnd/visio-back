@@ -32,14 +32,10 @@ class QueryBuilder extends BaseQuery {
      * @param int $id
      * @return void
      */
-    public function remove(): void {
+    public static function destroy($id) {
         $SQL = "DELETE FROM " . self::table() . " WHERE " . static::$primaryKey . " =:id";
         $statement = Environment::getInstance()->cnx->prepare($SQL);
-        $primaryKeyValue = $this->getPrimaryKeyValue();
-        $statement->bindParam("id", $primaryKeyValue);
-        if ($statement->execute()) {
-            $this->setPrimaryKeyValue(0);
-        }
+        return $statement->bindParam("id", $id);
     }
 
 
@@ -139,6 +135,9 @@ class QueryBuilder extends BaseQuery {
 
 
     public function with(...$args) {
+        if(!(isset($this)))
+            return parent::with(...$args);
+            
         $relationship_index = -1;
         foreach ($args as $index => $arg) {
             $nested_relationships = [];
@@ -148,9 +147,9 @@ class QueryBuilder extends BaseQuery {
                     $parent = $relations[$index - 1];
                     $nested_relationships[$parent][] = $relation;
                 } else {
-                    if(method_exists($this, $relation)){
+                    if (method_exists($this, $relation)) {
                         $this->{$relation} = call_user_func(array($this, $relation));
-                    }else{
+                    } else {
                         throw new RelationNotFoundException($relation, get_class($this));
                     }
                 }

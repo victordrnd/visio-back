@@ -140,8 +140,9 @@ class BaseQuery {
     }
 
     public function with(...$relationships) {
-        $this->with = array_merge($this->with, $relationships);
-        return $this;
+        $instance = self::get_instance(get_called_class());
+        $instance->with = array_merge($instance->with, $relationships);
+        return $instance;
     }
 
 

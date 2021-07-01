@@ -6,12 +6,14 @@ use Models\User;
 use Framework\Core\Http\Request;
 use Framework\Facades\Auth;
 use Framework\Facades\JWT;
+use Http\Requests\Auth\LoginRequest;
+use Models\Country;
 
 class AuthController extends Controller {
 
     public function getAll() {
         
-        return response()->json(User::all());
+        return Country::with('cities')->get();//User::orderBy('user_id')->with('roles')->get();
     }
 
     public function current(){
@@ -19,7 +21,7 @@ class AuthController extends Controller {
     }
 
 
-    public function login(Request $req) {
+    public function login(LoginRequest $req) {
         $credentials = $req->only('login', 'password');
         if (!$token = auth()->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);

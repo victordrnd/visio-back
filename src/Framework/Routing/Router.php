@@ -358,15 +358,17 @@ class Router {
         }
         try{
             $function_result = call_user_func_array([Resolver::resolve($class), $method], $params);
-            if ($function_result === false) {
-                if ($function_result = forward_static_call_array([$class, $method], $params) === false);
-            }
-            if ($function_result instanceof Response) {
-                echo $function_result->finalize();
-                die;
-            }else{
-                echo (new Response($function_result))->finalize();
-                die;
+            if(!preg_match("/Middleware/i", $class)){
+                if ($function_result === false) {
+                    if ($function_result = forward_static_call_array([$class, $method], $params) === false);
+                }
+                if ($function_result instanceof Response) {
+                    echo $function_result->finalize();
+                    die;
+                }else{
+                    echo (new Response($function_result))->finalize();
+                    die;
+                }
             }
         }catch(\Exception $e){
             echo response()->json(['title' => get_class($e), 'error' => $e->getMessage()],$e->getCode())->finalize();
