@@ -78,30 +78,30 @@ class QueryBuilder extends BaseQuery {
      * @param array $columns
      * @return void
      */
-    public static function create(array $columns) {
-        $SQL = "INSERT INTO " . self::table() . " (";
-        $last_key = end(array_keys($columns));
-        $indexed = "(";
-        foreach ($columns as $key => $column) {
-            if ($key != $last_key) {
-                $SQL .= "$key ,";
-                $indexed .= "?,";
-            } else {
-                $SQL .= "$key ) VALUES ";
-                $indexed .= "?)";
-            }
-        }
-        $SQL .= $indexed;
-        $values = array_values($columns);
-        foreach ($values as &$value) {
-            $value = htmlspecialchars($value);
-        }
-        $cnx = Environment::getInstance()->cnx;
-        $cnx->setAttribute(\PDO::ATTR_EMULATE_PREPARES, TRUE);
-        $statement = $cnx->prepare($SQL);
-        $statement->execute($values);
-        return get_called_class()::find($cnx->lastInsertId());
-    }
+    // public static function create(array $columns) {
+    //     $SQL = "INSERT INTO " . self::table() . " (";
+    //     $last_key = end(array_keys($columns));
+    //     $indexed = "(";
+    //     foreach ($columns as $key => $column) {
+    //         if ($key != $last_key) {
+    //             $SQL .= "$key ,";
+    //             $indexed .= "?,";
+    //         } else {
+    //             $SQL .= "$key ) VALUES ";
+    //             $indexed .= "?)";
+    //         }
+    //     }
+    //     $SQL .= $indexed;
+    //     $values = array_values($columns);
+    //     foreach ($values as &$value) {
+    //         $value = htmlspecialchars($value);
+    //     }
+    //     $cnx = Environment::getInstance()->cnx;
+    //     $cnx->setAttribute(\PDO::ATTR_EMULATE_PREPARES, TRUE);
+    //     $statement = $cnx->prepare($SQL);
+    //     $statement->execute($values);
+    //     return get_called_class()::find($cnx->lastInsertId());
+    // }
 
 
 

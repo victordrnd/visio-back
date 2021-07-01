@@ -55,6 +55,20 @@ class BaseQuery {
     }
 
 
+    public static function create(array $inputs) {
+        $instance = self::get_instance(get_called_class());
+        $instance->type = QueryType::INSERT;
+        $instance->inputs = $inputs;
+        $instance->build();
+        $cnx = Environment::getInstance()->cnx;
+        $cnx->setAttribute(\PDO::ATTR_EMULATE_PREPARES, TRUE);
+        $statement = $cnx->prepare($instance->SQL);
+        $statement->execute($instance->values_bindings);
+        $instance->values_bindings = [];
+        return $instance->where(get_called_class()::$primaryKey, $cnx->lastInsertId())->first();
+    }
+    
+    
     public function update(array $inputs) {
         $instance = self::get_instance(get_called_class());
         $instance->type = QueryType::UPDATE;
@@ -192,6 +206,9 @@ class BaseQuery {
             case QueryType::SELECT:
                 $this->buildSelect();
                 break;
+            case QueryType::INSERT:
+                $this->buildInsert();
+                break;
             case QueryType::UPDATE:
                 $this->buildUpdate();
                 break;
@@ -239,6 +256,10 @@ class BaseQuery {
         $this->buildLimitOffset();
     }
 
+    private function buildInsert(){
+        $this->SQL = "INSERT INTO ". $this->table;
+        $this->buildInsertValues();
+    }
 
     private function buildUpdate() {
         $this->SQL = "UPDATE " . $this->table;
@@ -300,6 +321,25 @@ class BaseQuery {
             $this->SQL .= " OFFSET " . $this->offset;
     }
 
+    private function buildInsertValues(){
+        $this->SQL .= " (";
+        $arr_keys = array_keys($this->inputs);
+        $last_key = end($arr_keys);
+        $indexed = "(";
+        foreach ($this->inputs as $key => $column) {
+            if ($key != $last_key) {
+                $this->SQL .= "$key ,";
+                $indexed .= "?,";
+            } else {
+                $this->SQL .= "$key ) VALUES ";
+                $indexed .= "?)";
+            }
+        }
+        $this->SQL .= $indexed;
+        foreach (array_values($this->inputs) as &$value) {
+            $this->values_bindings[] = htmlspecialchars($value);
+        }
+    }
 
     private function buildUpdateSet() {
         $this->SQL .= " SET";
@@ -314,4 +354,7 @@ class BaseQuery {
             $this->values_bindings[] = $value;
         }
     }
+
+
+
 }
