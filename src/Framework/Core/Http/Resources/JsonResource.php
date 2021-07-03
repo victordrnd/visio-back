@@ -3,10 +3,7 @@
 
 namespace Framework\Core\Http\Resources;
 
-interface JsonResourceInterface{
-    public function toArray();
-}
-
+use Framework\Core\Contracts\Resources\JsonResourceInterface;
 
 abstract class JsonResource implements JsonResourceInterface, \JsonSerializable{
 
@@ -25,6 +22,7 @@ abstract class JsonResource implements JsonResourceInterface, \JsonSerializable{
     public function __call(string $function, array $arguments){
         return call_user_func_array(array($this->model, $function), $arguments);
     }
+
 
 
     public function jsonSerialize() {

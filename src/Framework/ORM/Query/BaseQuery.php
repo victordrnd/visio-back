@@ -184,7 +184,7 @@ class BaseQuery {
         $items =  $statement->fetchAll();
         if (!empty($this->with)) {
             foreach ($items as $item) {
-                call_user_func_array(array($item, "with"), $this->with);
+                call_user_func_array(array($item, "load"), $this->with);
             }
         }
         if(!$paginate){

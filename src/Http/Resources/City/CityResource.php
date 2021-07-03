@@ -13,7 +13,7 @@ class CityResource extends JsonResource{
 
         return [
             'id' => $this->City_Id,
-            'test' => $this->country->languages
+            'test' => $this->country
         ];
     }
 

@@ -43,9 +43,6 @@ abstract class Model extends QueryBuilder implements \JsonSerializable {
         }
     }
 
-    public function getProperties() : array{
-        return $this->model_properties;
-    }
 
     public function jsonSerialize()
     {
