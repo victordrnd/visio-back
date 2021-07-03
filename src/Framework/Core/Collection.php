@@ -29,14 +29,14 @@ class Collection extends ArrayObject implements \JsonSerializable{
         return end($this->array);
     }
 
-    // public function with(string ...$args) {
-    //     foreach ($args as $arg) {
-    //         foreach ($this->array as $element) {
-    //             $element->{$arg} = call_user_func_array(array($element, "with"), $args);
-    //         }
-    //     }
-    //     return $this;
-    // }
+    public function with(string ...$args) {
+        foreach ($args as $arg) {
+            foreach ($this->array as &$element) {
+                $element->{$arg} = call_user_func_array(array($element, "load"), $args);
+            }
+        }
+        return $this;
+    }
 
 
     public function map($callback) : array {

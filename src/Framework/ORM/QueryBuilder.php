@@ -2,6 +2,7 @@
 
 namespace Framework\ORM;
 
+use Exception;
 use Framework\Core\Environment;
 use Framework\ORM\Relationship;
 use Framework\Core\Collection;
@@ -103,9 +104,9 @@ class QueryBuilder extends BaseQuery {
 
 
     public function load(...$args) {
-        if(!(isset($this)))
+        if (!(isset($this)))
             return parent::with(...$args);
-            
+
         $relationship_index = -1;
         foreach ($args as $index => $arg) {
             $nested_relationships = [];
@@ -122,8 +123,11 @@ class QueryBuilder extends BaseQuery {
                     }
                 }
             }
-            foreach ($nested_relationships as $nested_key => $nested_value) {
-                call_user_func_array(array($this->{$nested_key}, "load"), $nested_value);
+            foreach ($nested_relationships as $nested_key => &$nested_value) {
+                $nested_value = isset($nested_value[0]) ? $nested_value[0] : $nested_value;
+                if(!($this->{$nested_key} instanceof Collection)){
+                    call_user_func_array(array($this->{$nested_key}, "load"), $nested_value);
+                }
             }
         }
         return $this;

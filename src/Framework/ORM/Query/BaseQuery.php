@@ -67,8 +67,8 @@ class BaseQuery {
         $instance->values_bindings = [];
         return $instance->where(get_called_class()::$primaryKey, $cnx->lastInsertId())->first();
     }
-    
-    
+
+
     public function update(array $inputs) {
         $instance = self::get_instance(get_called_class());
         $instance->type = QueryType::UPDATE;
@@ -78,15 +78,15 @@ class BaseQuery {
         $statement->execute($instance->values_bindings);
         $instance->values_bindings = [];
         $static = !(isset($this) && get_class($this) == __CLASS__);
-        if($static){
+        if ($static) {
             return $instance->get();
-        }else{
+        } else {
             return $instance->first();
         }
     }
 
 
-    public function delete(){
+    public function delete() {
         $instance = self::get_instance(get_called_class());
         $instance->type = QueryType::DELETE;
         $instance->build();
@@ -114,10 +114,27 @@ class BaseQuery {
         return $this;
     }
 
-    public function whereNull($column){
-
+    public function whereNull($column) {
+        $instance = self::get_instance(get_called_class());
+        $instance->wheres[] = new WhereQuery($column, 'IS NULL', null);
+        return $instance;
     }
 
+    public function orWhereNull($column) {
+        $this->wheres[] = new WhereQuery($column, 'IS NULL', null, WhereQuery::OR);
+        return $this;
+    }
+
+    public function whereNotNull($column) {
+        $instance = self::get_instance(get_called_class());
+        $instance->wheres[] = new WhereQuery($column, 'IS NOT NULL');
+        return $instance;
+    }
+
+    public function orWhereNotNull($column) {
+        $this->wheres[] = new WhereQuery($column, 'IS NOT NULL', null, WhereQuery::OR);
+        return $this;
+    }
 
     public static function limit(int $count) {
         $instance = self::get_instance(get_called_class());
@@ -187,10 +204,9 @@ class BaseQuery {
                 call_user_func_array(array($item, "load"), $this->with);
             }
         }
-        if(!$paginate){
+        if (!$paginate) {
             return new Collection($items);
-        }else{
-
+        } else {
         }
     }
 
@@ -266,8 +282,8 @@ class BaseQuery {
         $this->buildLimitOffset();
     }
 
-    private function buildInsert(){
-        $this->SQL = "INSERT INTO ". $this->table;
+    private function buildInsert() {
+        $this->SQL = "INSERT INTO " . $this->table;
         $this->buildInsertValues();
     }
 
@@ -277,7 +293,7 @@ class BaseQuery {
         $this->buildWhere();
     }
 
-    private function buildDelete(){
+    private function buildDelete() {
         $this->SQL = "DELETE ";
         $this->buildFrom();
         $this->buildWhere();
@@ -291,16 +307,18 @@ class BaseQuery {
         if (!empty($this->wheres)) {
             foreach ($this->wheres as $index => $where_instance) {
                 if ($index == 0) {
-                    $this->SQL .= " WHERE " . $where_instance->column . " " . $where_instance->operator . " ?";
+                    $this->SQL .= " WHERE ";
+                } else if ($where_instance->type == WhereQuery::AND) {
+                    $this->SQL .= " AND ";
                 } else {
-                    if ($where_instance->type == WhereQuery::AND) {
-                        $this->SQL .= " AND ";
-                    } else {
-                        $this->SQL = " OR ";
-                    }
-                    $this->SQL .= $where_instance->column . " " . $where_instance->operator . " ?";
+                    $this->SQL = " OR ";
                 }
-                $this->values_bindings[] = $where_instance->value;
+                if (in_array($where_instance->operator, ["IS NULL", "IS NOT NULL"])) {
+                    $this->SQL .= $where_instance->column . " " . $where_instance->operator;
+                } else {
+                    $this->SQL .= $where_instance->column . " " . $where_instance->operator . " ?";
+                    $this->values_bindings[] = $where_instance->value;
+                }
             }
         }
     }
@@ -331,7 +349,7 @@ class BaseQuery {
             $this->SQL .= " OFFSET " . $this->offset;
     }
 
-    private function buildInsertValues(){
+    private function buildInsertValues() {
         $this->SQL .= " (";
         $arr_keys = array_keys($this->inputs);
         $last_key = end($arr_keys);
@@ -364,7 +382,4 @@ class BaseQuery {
             $this->values_bindings[] = $value;
         }
     }
-
-
-
 }
