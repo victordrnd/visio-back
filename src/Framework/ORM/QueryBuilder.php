@@ -69,38 +69,6 @@ class QueryBuilder extends BaseQuery {
         }
     }
 
-    /**
-     * Create the entity with the specified columns
-     *
-     * @param array $columns
-     * @return void
-     */
-    // public static function create(array $columns) {
-    //     $SQL = "INSERT INTO " . self::table() . " (";
-    //     $last_key = end(array_keys($columns));
-    //     $indexed = "(";
-    //     foreach ($columns as $key => $column) {
-    //         if ($key != $last_key) {
-    //             $SQL .= "$key ,";
-    //             $indexed .= "?,";
-    //         } else {
-    //             $SQL .= "$key ) VALUES ";
-    //             $indexed .= "?)";
-    //         }
-    //     }
-    //     $SQL .= $indexed;
-    //     $values = array_values($columns);
-    //     foreach ($values as &$value) {
-    //         $value = htmlspecialchars($value);
-    //     }
-    //     $cnx = Environment::getInstance()->cnx;
-    //     $cnx->setAttribute(\PDO::ATTR_EMULATE_PREPARES, TRUE);
-    //     $statement = $cnx->prepare($SQL);
-    //     $statement->execute($values);
-    //     return get_called_class()::find($cnx->lastInsertId());
-    // }
-
-
 
     /**
      * Update the calling entity
@@ -134,7 +102,7 @@ class QueryBuilder extends BaseQuery {
 
 
 
-    public function with(...$args) {
+    public function load(...$args) {
         if(!(isset($this)))
             return parent::with(...$args);
             
@@ -155,7 +123,7 @@ class QueryBuilder extends BaseQuery {
                 }
             }
             foreach ($nested_relationships as $nested_key => $nested_value) {
-                call_user_func_array(array($this->{$nested_key}, "with"), $nested_value);
+                call_user_func_array(array($this->{$nested_key}, "load"), $nested_value);
             }
         }
         return $this;

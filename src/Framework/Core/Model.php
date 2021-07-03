@@ -15,9 +15,15 @@ abstract class Model extends QueryBuilder implements \JsonSerializable {
     
 
     public function __get(string $name){
-        if(isset($this->model_properties[$name]))
+        if(isset($this->model_properties[$name])){
             return $this->model_properties[$name];
-        return NULL;
+        }
+        else{
+            if(method_exists(get_called_class(), $name)){
+                return call_user_func(array($this, $name));
+            }
+            return NULL;
+        }
     }
 
     public function __set(string $name, $value){
@@ -37,6 +43,9 @@ abstract class Model extends QueryBuilder implements \JsonSerializable {
         }
     }
 
+    public function getProperties() : array{
+        return $this->model_properties;
+    }
 
     public function jsonSerialize()
     {

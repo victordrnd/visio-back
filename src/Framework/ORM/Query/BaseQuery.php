@@ -46,7 +46,7 @@ class BaseQuery {
     private $entity;
 
 
-    public $SQL;
+    private $SQL;
 
     public static function select(...$columns) {
         $instance = self::get_instance(get_called_class());
@@ -114,6 +114,11 @@ class BaseQuery {
         return $this;
     }
 
+    public function whereNull($column){
+
+    }
+
+
     public static function limit(int $count) {
         $instance = self::get_instance(get_called_class());
         $instance->limit = $count;
@@ -158,7 +163,7 @@ class BaseQuery {
             throw new ModelNotFoundException;
         }
         if (!empty($this->with)) {
-            return call_user_func_array(array($object, "with"), $this->with);
+            return call_user_func_array(array($object, "load"), $this->with);
         }
         return $object;
     }
@@ -169,7 +174,7 @@ class BaseQuery {
     }
 
 
-    public function get() {
+    public function get($paginate = false) {
         $this->type = QueryType::SELECT;
         $this->build();
         $statement = Environment::getInstance()->cnx->prepare($this->SQL);
@@ -182,14 +187,18 @@ class BaseQuery {
                 call_user_func_array(array($item, "with"), $this->with);
             }
         }
-        return new Collection($items);
+        if(!$paginate){
+            return new Collection($items);
+        }else{
+
+        }
     }
 
 
     public function paginate(int $per_page = 15, int $page = 1) {
         $this->limit = $per_page;
         $this->offset = ($page - 1) * $per_page;
-        return $this->get();
+        return $this->get(true);
     }
 
     public static function count() {

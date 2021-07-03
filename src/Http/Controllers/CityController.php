@@ -4,7 +4,9 @@ namespace Http\Controllers;
 
 use Models\City;
 use Framework\Core\Http\Request;
+use Framework\Core\Http\Resources\JsonResource;
 use Http\Requests\ShowCityRequest;
+use Http\Resources\City\CityResource;
 
 class CityController extends Controller
 {
@@ -18,8 +20,8 @@ class CityController extends Controller
      */
     public function show(int $id)
     {
-        $city = City::where("City_Id", $id)->with('country.capital')->first();
-       
+        $city = new CityResource(City::where("City_Id", $id)->first());
+        //$city = City::where('City_Id', $id)->first();
         return $city;
     }
 
