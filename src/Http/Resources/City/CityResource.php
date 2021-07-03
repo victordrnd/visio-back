@@ -9,11 +9,12 @@ use Framework\Core\Http\Resources\JsonResource;
 class CityResource extends JsonResource{
 
 
-    public function toArray(){
+    public function toArray(Request $req){
 
         return [
             'id' => $this->City_Id,
-            'test' => $this->country
+            'test' => $this->country,
+            'req' => $req
         ];
     }
 

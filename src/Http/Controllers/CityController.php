@@ -2,6 +2,7 @@
 
 namespace Http\Controllers;
 
+use Framework\Core\App;
 use Models\City;
 use Framework\Core\Http\Request;
 use Framework\Core\Http\Resources\JsonResource;
@@ -22,10 +23,9 @@ class CityController extends Controller
      */
     public function show(int $id)
     {
-        //$city = new CityResourceCollection(City::where("City_Id","!=",  $id)->with('country')->get());
+        $city = new CityResource(City::where("City_Id", $id)->with('country')->first());
         //$city = City::where('City_Id', $id)->with('country')->first();
-        $country = Country::whereNotNull("GNPOld")->with('cities.country')->get();
-        return $country;
+        return $city;
     }
 
 

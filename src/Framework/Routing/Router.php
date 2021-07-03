@@ -6,6 +6,7 @@ use Exception;
 use Framework\Core\Http\Request;
 use Framework\Core\Resolver;
 use Framework\Core\Http\Response;
+use Framework\Core\App;
 
 class Router {
 
@@ -353,8 +354,12 @@ class Router {
                 if(is_array($errors)){
                     echo response()->json(['errors' => $errors], 401)->finalize();die;
                 }
+                App::setRequest($param);
                 break;
             }
+        }
+        if(is_null(App::request())){
+            App::setRequest(new Request);
         }
         try{
             $function_result = call_user_func_array([Resolver::resolve($class), $method], $params);

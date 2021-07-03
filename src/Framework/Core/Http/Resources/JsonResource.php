@@ -3,6 +3,7 @@
 
 namespace Framework\Core\Http\Resources;
 
+use Framework\Core\App;
 use Framework\Core\Contracts\Resources\JsonResourceInterface;
 
 abstract class JsonResource implements JsonResourceInterface, \JsonSerializable{
@@ -26,6 +27,6 @@ abstract class JsonResource implements JsonResourceInterface, \JsonSerializable{
 
 
     public function jsonSerialize() {
-        return $this->toArray();
+        return $this->toArray(App::request());
     }
 }

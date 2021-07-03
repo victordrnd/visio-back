@@ -10,11 +10,12 @@ class Request {
     public $url;
 
     public $params = [];
-
+    public $headers;
 
     public function __construct() {
         $this->extractInputs();
         $this->extractHeader();
+        
     }
 
 
@@ -58,6 +59,7 @@ class Request {
 
     private function extractHeader() {
         $this->url = $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        $this->headers = HttpHeader::getHeaders();
     }
 
 
