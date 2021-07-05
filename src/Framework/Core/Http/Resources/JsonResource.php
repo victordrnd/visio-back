@@ -21,7 +21,9 @@ abstract class JsonResource implements JsonResourceInterface, \JsonSerializable{
 
 
     public function __call(string $function, array $arguments){
-        return call_user_func_array(array($this->model, $function), $arguments);
+        if(method_exists($this->model, $function)){
+            return call_user_func_array(array($this->model, $function), $arguments);
+        }
     }
 
 

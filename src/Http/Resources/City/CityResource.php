@@ -5,6 +5,7 @@
 namespace Http\Resources\City;
 use Framework\Core\Http\Request;
 use Framework\Core\Http\Resources\JsonResource;
+use Framework\Core;
 
 class CityResource extends JsonResource{
 
@@ -14,7 +15,8 @@ class CityResource extends JsonResource{
         return [
             'id' => $this->City_Id,
             'test' => $this->country,
-            'req' => $req
+            'req' => $req,
+            'user' => auth()->user()
         ];
     }
 

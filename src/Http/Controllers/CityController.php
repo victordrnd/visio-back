@@ -23,9 +23,9 @@ class CityController extends Controller
      */
     public function show(int $id)
     {
-        $city = new CityResource(City::where("City_Id", $id)->with('country')->first());
-        //$city = City::where('City_Id', $id)->with('country')->first();
-        return $city;
+        //$city = new CityResource(City::where("City_Id", $id)->with('country')->first());
+        $city = City::where('City_Id', $id)->with('country')->first();
+        return response()->json($city);
     }
 
 

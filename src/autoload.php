@@ -10,7 +10,10 @@ class Autoloader
 
     public static function autoload($class)
     {
-
+        if($class == App::class){
+            require_once dirname(__FILE__).DIRECTORY_SEPARATOR."Framework".DIRECTORY_SEPARATOR."Core".DIRECTORY_SEPARATOR."App.php";
+            return;
+        }
         $parts = preg_split('#\\\#', $class);
         $className = array_pop($parts);
 

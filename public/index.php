@@ -1,5 +1,7 @@
 
 <?php
+
+use Framework\Core\App;
 use Framework\Core\Http\Response;
 use Framework\Facades\Auth;
 use Framework\Routing\Router;
@@ -11,6 +13,9 @@ header('Content-Type: application/json');
 |
 */
 require_once '../src/autoload.php';
+require_once "../src/Framework/Core/Helpers/helpers.php";
+
+
 Autoloader::register();
 
 
@@ -29,13 +34,7 @@ Router::run();
 
 
 
+$app = new App;
 
-function response() {
-    return new Response();
-}
-
-function auth(){
-    return new Auth();
-}
 
 ?>

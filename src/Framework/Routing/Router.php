@@ -3,10 +3,10 @@
 namespace Framework\Routing;
 
 use Exception;
+use Framework\Core\App;
 use Framework\Core\Http\Request;
 use Framework\Core\Resolver;
 use Framework\Core\Http\Response;
-use Framework\Core\App;
 
 class Router {
 
