@@ -5,12 +5,13 @@ namespace Framework\Core\Http\Resources;
 
 use Framework\Core\App;
 use Framework\Core\Contracts\Resources\JsonResourceInterface;
+use Framework\Core\Model;
 
 abstract class JsonResource implements JsonResourceInterface, \JsonSerializable{
 
     private $model= null;
 
-    public function __construct($model){
+    public function __construct(Model $model){
         $this->model = $model;
     }
    

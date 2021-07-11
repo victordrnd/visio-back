@@ -58,8 +58,10 @@ class Request {
     }
 
     private function extractHeader() {
-        $this->url = $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+        $this->url = $protocol.$_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
         $this->headers = HttpHeader::getHeaders();
+        $this->uri = explode('?', $this->url, 2)[0];
     }
 
 

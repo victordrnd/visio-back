@@ -2,9 +2,11 @@
 
 namespace Framework\ORM\Query;
 
+use Framework\Core\App;
 use Framework\Core\Collection;
 use Framework\Core\Environment;
 use Framework\Core\Exceptions\ModelNotFoundException;
+use Framework\Core\Http\Resources\PaginationResourceCollection;
 
 class BaseQuery {
 
@@ -191,7 +193,7 @@ class BaseQuery {
     }
 
 
-    public function get($paginate = false) {
+    public function get($paginate = false, int $total = 0) {
         $this->type = QueryType::SELECT;
         $this->build();
         $statement = Environment::getInstance()->cnx->prepare($this->SQL);
@@ -207,30 +209,36 @@ class BaseQuery {
         if (!$paginate) {
             return new Collection($items);
         } else {
+            return new PaginationResourceCollection($items, $this->limit, $total);
         }
     }
 
 
-    public function paginate(int $per_page = 15, int $page = 1) {
+    public function paginate(int $per_page = 15) {
+        $page = App::request()->page ?? 1;
         $this->limit = $per_page;
         $this->offset = ($page - 1) * $per_page;
-        return $this->get(true);
+        $total = $this->count();
+        $instance = self::get_instance(get_called_class());
+        $instance->selects = [];
+        $instance->values_bindings = [];
+        return $this->get(true, $total);
     }
 
     public static function count() {
         $instance = self::get_instance(get_called_class());
         $instance->selects = ["COUNT(*) as count"];
-        $instance->build();
+        $instance->build(false);
         $statement = Environment::getInstance()->cnx->prepare($instance->SQL);
         $statement->execute($instance->values_bindings);
         $res = $statement->fetchObject();
         return $res->count;
     }
 
-    private function build(): void {
+    private function build($limit_offset = true): void {
         switch ($this->type) {
             case QueryType::SELECT:
-                $this->buildSelect();
+                $this->buildSelect($limit_offset);
                 break;
             case QueryType::INSERT:
                 $this->buildInsert();
@@ -258,7 +266,7 @@ class BaseQuery {
     }
 
 
-    private function buildSelect(): void {
+    private function buildSelect($limit_offset = true): void {
         $this->SQL = "SELECT ";
         //SELECT 
         if (empty($this->selects)) {
@@ -279,7 +287,8 @@ class BaseQuery {
         $this->buildOrderBy();
 
         //LIMIT & OFFSET
-        $this->buildLimitOffset();
+        if ($limit_offset)
+            $this->buildLimitOffset();
     }
 
     private function buildInsert() {
