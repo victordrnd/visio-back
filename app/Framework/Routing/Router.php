@@ -174,7 +174,7 @@ class Router {
                 self::group($baseRoute['prefix'], $fn);
                 if (isset($baseRoute['middleware'])) {
                     self::before('GET|POST|PUT|DELETE|OPTIONS|PATCH|HEAD', $baseRoute['prefix'].".*", function() use ($baseRoute){
-                        $middlewares = include $_SERVER['DOCUMENT_ROOT'] . "/config/middlewares.php";
+                        $middlewares = include $_SERVER['DOCUMENT_ROOT'] . "/config/middleware.php";
                         self::call_class_function($middlewares[$baseRoute["middleware"]], "handle");
                     });
                 }
