@@ -12,8 +12,8 @@ header('Content-Type: application/json');
 |--------------------------------------------------------------------------
 |
 */
-require_once '../src/autoload.php';
-require_once "../src/Framework/Core/Helpers/helpers.php";
+require_once '../app/autoload.php';
+require_once "../app/Framework/Core/Helpers/helpers.php";
 
 
 Autoloader::register();
