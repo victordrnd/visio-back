@@ -61,7 +61,7 @@ trait Relationship
      * @param [type] $localkey
      * @return void
      */
-    protected function belongsToMany($entity, $AssociationEntity,string $foreign_key,string $localkey)
+    protected function hasManyThrough($entity, $AssociationEntity,string $foreign_key,string $localkey)
     {
         $values = [];
         $AssociationValues = $AssociationEntity::where($localkey, $this->{$localkey})->get();

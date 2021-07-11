@@ -32,7 +32,7 @@ class User extends Model
     protected $hidden = ["password"]; 
 
     public function roles(){
-        return $this->belongsToMany(Role::class, UserRole::class, 'role_id', 'user_id');
+        return $this->hasManyThrough(Role::class, UserRole::class, 'role_id', 'user_id');
     }
 
 
