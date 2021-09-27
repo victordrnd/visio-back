@@ -9,6 +9,8 @@ abstract class Model extends QueryBuilder implements \JsonSerializable {
     
     protected static $primaryKey = "id";
 
+    public static $timestamps = true;
+
     private $model_properties = [];
 
     protected $hidden = [];

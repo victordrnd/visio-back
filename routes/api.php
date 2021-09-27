@@ -9,8 +9,13 @@ Router::group('/auth', function (){
 });
 
 
-Router::group(['prefix' => '/users', 'middleware' => 'auth:api'], function(){
-    Router::get("/", "AuthController@getAll");
+// Router::group(['prefix' => '/users', 'middleware' => 'auth:api'], function(){
+//     Router::get("/", "AuthController@getAll");
+// });
+
+Router::group(["prefix" => '/users'], function(){
+    Router::get('/{id}', 'UserController@show');
+    Router::post('/', "UserController@store");
 });
 
 

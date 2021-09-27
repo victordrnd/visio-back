@@ -12,6 +12,8 @@ class City extends Model{
     */
    protected static $primaryKey = "City_Id";
 
+   // public $timestamps = false;
+
    /**
     * List of all table column
     *

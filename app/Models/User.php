@@ -20,20 +20,20 @@ class User extends Model
      *
      * @var string
      */
-    protected static $primaryKey = "user_id";
+    protected static $primaryKey = "id";
     
     /**
      * List of all table column
      *
      * @var array
      */
-    protected static $attributes = ['nom', 'login', 'password'];
+    protected static $attributes = ['firstname', 'lastname','email', 'password'];
     
     protected $hidden = ["password"]; 
 
-    public function roles(){
-        return $this->hasManyThrough(Role::class, UserRole::class, 'role_id', 'user_id');
-    }
+    // public function roles(){
+    //     return $this->hasManyThrough(Role::class, UserRole::class, 'role_id', 'user_id');
+    // }
 
 
 

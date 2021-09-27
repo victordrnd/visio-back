@@ -66,7 +66,7 @@ class Request {
 
 
     public function __get($property) {
-        return $this->params[$property];
+        return isset($this->params[$property]) ? $this->params[$property] : null;
     }
 
     public function rules(){

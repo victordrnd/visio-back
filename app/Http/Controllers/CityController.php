@@ -23,7 +23,12 @@ class CityController extends Controller
      */
     public function show(int $id)
     {
-        $city = City::where("City_Id",">=", $id)->with('country')->paginate();
+        $city = City::create([
+            'name' => "testxxx",
+            'CountryCode' =>"FRB",
+            'district' => "Lyon",
+            'population' => 400
+        ]);
         //$city = City::where('City_Id', $id)->with('country')->first();
         return response()->json($city);
     }
