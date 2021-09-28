@@ -67,9 +67,8 @@ class BaseQuery {
         $cnx->setAttribute(\PDO::ATTR_EMULATE_PREPARES, TRUE);
         $statement = $cnx->prepare($instance->SQL);
         $statement->execute($instance->values_bindings);
-        var_dump($cnx->lastInsertId("city"));
         $instance->values_bindings = [];
-        return $instance->where(get_called_class()::$primaryKey, $cnx->lastInsertId())->first();
+        return $instance->orderBy('id', 'DESC')->limit(1)->first();
     }
 
 
@@ -77,7 +76,7 @@ class BaseQuery {
         $instance = self::get_instance(get_called_class());
         $instance->type = QueryType::UPDATE;
         $instance->inputs = $inputs;
-        $instance->touchModel(get_called_class(), false);
+        $instance->touchModel(get_called_class());
         $instance->build();
         $statement = Environment::getInstance()->cnx->prepare($instance->SQL);
         $statement->execute($instance->values_bindings);
@@ -398,7 +397,7 @@ class BaseQuery {
 
 
     private function touchModel($called_class ,$created_at = false){
-        if($called_class::$timestamps){;
+        if($this->entity::$timestamps){
             $date = date("Y-m-d H:i:s");
             if($created_at){
                 $this->inputs = array_merge($this->inputs, ['updated_at' => $date,'created_at' => $date]);
@@ -406,5 +405,6 @@ class BaseQuery {
                 $this->inputs = array_merge($this->inputs, ['updated_at' => $date]);
             }
         }
-    }   
+    } 
+    
 }

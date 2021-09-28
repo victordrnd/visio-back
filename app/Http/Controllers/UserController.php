@@ -24,13 +24,7 @@ class UserController extends Controller
      */
     public function show(int $id)
     {
-        // $user = User::where('id', $id)->first();
-        $user = User::create([
-            'firstname' =>"Victor",
-            'lastname' => "Durand",
-            'email' => "vic20016ddd@gmail.com",
-            'password' => Hash::make("test")
-        ]);
+        $user = User::where('id', $id)->first();
         return response()->json($user);
     }
 
