@@ -72,8 +72,16 @@ class BaseQuery {
     }
 
 
-    public function update(array $inputs) {
+    public function update(array $wheres, array $inputs2 = []) {
         $instance = self::get_instance(get_called_class());
+        if(empty($inputs2)){
+            $inputs = $wheres;
+        }else{
+            $inputs = $inputs2;
+            foreach($wheres as $column => $value){
+                $instance->where($column, $value);
+            }
+        }
         $instance->type = QueryType::UPDATE;
         $instance->inputs = $inputs;
         $instance->touchModel(get_called_class());
@@ -88,6 +96,7 @@ class BaseQuery {
             return $instance->first();
         }
     }
+
 
 
     public function delete() {

@@ -24,7 +24,16 @@ class UserController extends Controller
      */
     public function show(int $id)
     {
-        $user = User::where('id', $id)->first();
+        // $user = User::where('id', $id)->first();
+        $user = User::update([
+            'id' => 7
+        ],
+        [
+           'firstname' =>"Aniseees",
+            'lastname' => "Durand",
+            'email' => "vic200dd16jjddd@gmail.com",
+            'password' => Hash::make("test")
+        ]);
         return response()->json($user);
     }
 
