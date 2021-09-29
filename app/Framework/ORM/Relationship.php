@@ -14,8 +14,12 @@ trait Relationship
      * @param string $foreign_key
      * @return boolean
      */
-    protected function hasOne($entity, string $localkey, string $foreign_key)
+    protected function hasOne($entity, string $foreign_key = "", string $localkey ="")
     {
+        if(empty($foreign_key))
+            $this->generateKeyName(get_called_class());
+        if(empty($localkey))
+            $localkey = get_called_class()::$primaryKey;
         return $entity::where($foreign_key, $this->{$localkey})->first();
     }
 
@@ -24,13 +28,15 @@ trait Relationship
     /**
      * One to One
      *
-     * @param class $entity
+     * @param string $entity
      * @param string $localkey -> City -> CountryCode
      * @param string $foreign_key -> Country -> Code
      * @return void
      */
-    protected function belongsTo($entity, string $local_key, string $related_key = "id")
+    protected function belongsTo(string $entity, string $local_key = "", string $related_key = "id")
     {
+        if(empty($local_key))
+            $this->generateKeyName($entity);
         return $entity::where($related_key, $this->{$local_key})->first();
     }
 
@@ -46,8 +52,12 @@ trait Relationship
      * @param string $foreign_key
      * @return boolean
      */
-    protected function hasMany($entity, string $localkey, string $foreign_key)
+    protected function hasMany($entity, string $localkey = "", string $foreign_key = "")
     {
+        if(empty($foreign_key))
+            $this->generateKeyName(get_called_class());
+        if(empty($localkey))
+            $localkey = get_called_class()::$primaryKey;
         return $entity::where($foreign_key, $this->{$localkey})->get();
     }
 
@@ -69,6 +79,14 @@ trait Relationship
             $values[] = $entity::find($AssociationRow->{$foreign_key});
         }
         return $values;
+    }
+
+
+    private function generateKeyName(string $entity) : string {
+        $class = explode('\\', $entity);
+        $key_name = strtolower(array_pop($class));
+        $key_name.= "_id";
+        return $key_name;
     }
 
 }

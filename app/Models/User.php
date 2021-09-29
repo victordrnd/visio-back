@@ -36,6 +36,9 @@ class User extends Model
     // }
 
 
+    public function room(){
+        return $this->hasMany(UserRoom::class);
+    }
 
     public static function getJWTIdentifier() : string
     {

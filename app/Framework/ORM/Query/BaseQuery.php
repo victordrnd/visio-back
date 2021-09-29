@@ -80,7 +80,7 @@ class BaseQuery
         $statement = $cnx->prepare($instance->SQL);
         $statement->execute($instance->values_bindings);
         $instance->values_bindings = [];
-        return $instance->getLastInsertedInstance();// $instance->orderBy('id', 'DESC')->limit(1)->first();
+        return $instance->getLastInsertedInstance();
     }
 
 
@@ -214,6 +214,7 @@ class BaseQuery
         $object =  $statement->fetchObject($this->entity);
         static::$instance = null;
         if (is_null($object) || is_bool($object)) {
+            return NULL;
             throw new ModelNotFoundException;
         }
         if (!empty($this->with)) {
@@ -221,6 +222,15 @@ class BaseQuery
         }
         return $object;
     }
+
+    public function firstOrFail(){
+        $object = $this->first();
+        if(is_null($object) || is_bool($object)){
+            throw new ModelNotFoundException;
+        }
+        return $object;
+    }
+
 
     public function last()
     {
