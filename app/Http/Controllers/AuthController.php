@@ -7,6 +7,7 @@ use Framework\Core\Http\Request;
 use Framework\Facades\Auth;
 use Framework\Facades\Hash;
 use Http\Requests\Auth\LoginRequest;
+use Http\Requests\Auth\RegisterRequest;
 
 class AuthController extends Controller
 {
@@ -44,7 +45,7 @@ class AuthController extends Controller
 
 
 
-    public function register(Request $req)
+    public function register(RegisterRequest $req)
     {
         if (!User::where('email', $req->email)->exists()) {
             $user = User::create([

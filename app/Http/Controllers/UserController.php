@@ -3,12 +3,8 @@
 namespace Http\Controllers;
 
 use Framework\Core\App;
-use Models\City;
 use Framework\Core\Http\Request;
 use Framework\Core\Http\Resources\JsonResource;
-use Http\Requests\ShowCityRequest;
-use Http\Resources\City\CityResource;
-use Http\Resources\City\CityResourceCollection;
 use Models\User;
 use Framework\Facades\Hash;
 
@@ -54,14 +50,7 @@ class UserController extends Controller
      */
     public function update(Request $req, int $id)
     {
-        $city = City::find($id);
-        $city->update([
-            'Name' => $req->name,
-            'CountryCode' => $req->countryCode,
-            'District' => $req->district,
-            'Population' => $req->population
-        ]);
-        return response()->json($city);
+       
     }
 
 
@@ -73,8 +62,6 @@ class UserController extends Controller
      */
     public function delete(int $id)
     {
-        $city = City::find($id);
-        $city->remove();
-        return response()->json(['success' => true]);
+       
     }
 }
