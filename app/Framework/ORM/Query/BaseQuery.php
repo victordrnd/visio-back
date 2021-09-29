@@ -8,16 +8,26 @@ use Framework\Core\Environment;
 use Framework\Core\Exceptions\ModelNotFoundException;
 use Framework\Core\Http\Resources\PaginationResourceCollection;
 
-class BaseQuery {
+class BaseQuery
+{
 
     private static $instance = null;
 
 
-    private function __construct($entity = null) {
-        $this->entity = $entity;
+    public function __construct($entity = null)
+    {
+        if(is_null($entity)){
+            $this->entity = get_called_class();
+        }else{
+            $this->entity = $entity;
+        }
         $this->table = self::table($entity);
     }
-    private static function get_instance($entity) {
+
+
+
+    private static function get_instance($entity)
+    {
         if (is_null(static::$instance)) {
             static::$instance =  new self($entity);
         }
@@ -50,56 +60,58 @@ class BaseQuery {
 
     private $SQL;
 
-    public static function select(...$columns) {
+    public static function select(...$columns)
+    {
         $instance = self::get_instance(get_called_class());
         $instance->selects = array_merge($instance->selects, $columns);
         return $instance;
     }
 
 
-    public static function create(array $inputs) {
+    public static function create(array $inputs)
+    {
         $instance = self::get_instance(get_called_class());
         $instance->type = QueryType::INSERT;
         $instance->inputs = $inputs;
-        $instance->touchModel(get_called_class(), true);
+        $instance->touchModel(true);
         $instance->build();
         $cnx = Environment::getInstance()->cnx;
         $cnx->setAttribute(\PDO::ATTR_EMULATE_PREPARES, TRUE);
         $statement = $cnx->prepare($instance->SQL);
         $statement->execute($instance->values_bindings);
         $instance->values_bindings = [];
-        return $instance->orderBy('id', 'DESC')->limit(1)->first();
+        return $instance->getLastInsertedInstance();// $instance->orderBy('id', 'DESC')->limit(1)->first();
     }
 
 
-    public function update(array $wheres, array $inputs2 = []) {
+    public function update(array $wheres, array $inputs2 = [])
+    {
         $instance = self::get_instance(get_called_class());
-        if(empty($inputs2)){
+        if (empty($inputs2)) {
             $inputs = $wheres;
-        }else{
+        } else {
             $inputs = $inputs2;
-            foreach($wheres as $column => $value){
+            foreach ($wheres as $column => $value) {
                 $instance->where($column, $value);
             }
         }
         $instance->type = QueryType::UPDATE;
         $instance->inputs = $inputs;
-        $instance->touchModel(get_called_class());
+        $instance->touchModel();
         $instance->build();
         $statement = Environment::getInstance()->cnx->prepare($instance->SQL);
         $statement->execute($instance->values_bindings);
         $instance->values_bindings = [];
         $static = !(isset($this) && get_class($this) == __CLASS__);
-        if ($static) {
+        if ($static)
             return $instance->get();
-        } else {
-            return $instance->first();
-        }
+        return $instance->first();
     }
 
 
 
-    public function delete() {
+    public function delete()
+    {
         $instance = self::get_instance(get_called_class());
         $instance->type = QueryType::DELETE;
         $instance->build();
@@ -107,7 +119,8 @@ class BaseQuery {
         return $statement->execute($instance->values_bindings);
     }
 
-    public static function where($column, $operator = "=", $value = null) {
+    public static function where($column, $operator = "=", $value = null)
+    {
         $instance = self::get_instance(get_called_class());
         if (is_null($value)) {
             $value = $operator;
@@ -118,7 +131,8 @@ class BaseQuery {
     }
 
 
-    public function orWhere($column, $operator = "=", $value = null) {
+    public function orWhere($column, $operator = "=", $value = null)
+    {
         if (is_null($value)) {
             $value = $operator;
             $operator = "=";
@@ -127,61 +141,71 @@ class BaseQuery {
         return $this;
     }
 
-    public function whereNull($column) {
+    public function whereNull($column)
+    {
         $instance = self::get_instance(get_called_class());
         $instance->wheres[] = new WhereQuery($column, 'IS NULL', null);
         return $instance;
     }
 
-    public function orWhereNull($column) {
+    public function orWhereNull($column)
+    {
         $this->wheres[] = new WhereQuery($column, 'IS NULL', null, WhereQuery::OR);
         return $this;
     }
 
-    public function whereNotNull($column) {
+    public function whereNotNull($column)
+    {
         $instance = self::get_instance(get_called_class());
         $instance->wheres[] = new WhereQuery($column, 'IS NOT NULL');
         return $instance;
     }
 
-    public function orWhereNotNull($column) {
+    public function orWhereNotNull($column)
+    {
         $this->wheres[] = new WhereQuery($column, 'IS NOT NULL', null, WhereQuery::OR);
         return $this;
     }
 
-    public static function limit(int $count) {
+    public static function limit(int $count)
+    {
         $instance = self::get_instance(get_called_class());
         $instance->limit = $count;
         return $instance;
     }
 
-    public static function offset(int $offset) {
+    public static function offset(int $offset)
+    {
         $instance = self::get_instance(get_called_class());
         $instance->offset = $offset;
         return $instance;
     }
 
-    public static function orderBy($column, $direction = "ASC") {
+    public static function orderBy($column, $direction = "ASC")
+    {
         $instance = self::get_instance(get_called_class());
         $order_instance = new OrderByQuery($column, $direction);
         $instance->ordersBy[] = $order_instance;
         return $instance;
     }
 
-    public static function groupBy(array ...$columns) {
+    public static function groupBy(array ...$columns)
+    {
         $instance = self::get_instance(get_called_class());
         $instance->groupsBy = array_merge($instance->groupsBy, $columns);
         return $instance;
     }
 
-    public function with(...$relationships) {
+    public function with(...$relationships)
+    {
         $instance = self::get_instance(get_called_class());
         $instance->with = array_merge($instance->with, $relationships);
         return $instance;
     }
 
 
-    public function first() {
+    public function first()
+    {
         $this->limit = 1;
         $this->type = QueryType::SELECT;
         $this->build();
@@ -198,13 +222,15 @@ class BaseQuery {
         return $object;
     }
 
-    public function last() {
+    public function last()
+    {
         $this->ordersBy[] = new OrderByQuery($this->entity::$primaryKey, "DESC");
         return $this->first();
     }
 
 
-    public function get($paginate = false, int $total = 0) {
+    public function get($paginate = false, int $total = 0)
+    {
         $this->type = QueryType::SELECT;
         $this->build();
         $statement = Environment::getInstance()->cnx->prepare($this->SQL);
@@ -217,15 +243,14 @@ class BaseQuery {
                 call_user_func_array(array($item, "load"), $this->with);
             }
         }
-        if (!$paginate) {
-            return new Collection($items);
-        } else {
+        if ($paginate)
             return new PaginationResourceCollection($items, $this->limit, $total);
-        }
+        return new Collection($items);
     }
 
 
-    public function paginate(int $per_page = 15) {
+    public function paginate(int $per_page = 15)
+    {
         $page = App::request()->page ?? 1;
         $this->limit = $per_page;
         $this->offset = ($page - 1) * $per_page;
@@ -236,7 +261,8 @@ class BaseQuery {
         return $this->get(true, $total);
     }
 
-    public static function count() {
+    public static function count()
+    {
         $instance = self::get_instance(get_called_class());
         $instance->selects = ["COUNT(*) as count"];
         $instance->build(false);
@@ -246,7 +272,8 @@ class BaseQuery {
         return $res->count;
     }
 
-    private function build($limit_offset = true): void {
+    private function build($limit_offset = true): void
+    {
         switch ($this->type) {
             case QueryType::SELECT:
                 $this->buildSelect($limit_offset);
@@ -261,13 +288,13 @@ class BaseQuery {
                 $this->buildDelete();
                 break;
         }
-        //var_dump($this->SQL, $this->inputs);die;
         $this->SQL .= ";";
     }
 
 
 
-    protected static function table($entity) {
+    protected static function table($entity)
+    {
         if (is_string($entity) || is_object($entity)) {
             if (isset($entity::$table))
                 return $entity::$table;
@@ -278,7 +305,8 @@ class BaseQuery {
     }
 
 
-    private function buildSelect($limit_offset = true): void {
+    private function buildSelect($limit_offset = true): void
+    {
         $this->SQL = "SELECT ";
         //SELECT 
         if (empty($this->selects)) {
@@ -303,28 +331,33 @@ class BaseQuery {
             $this->buildLimitOffset();
     }
 
-    private function buildInsert() {
+    private function buildInsert()
+    {
         $this->SQL = "INSERT INTO " . $this->table;
         $this->buildInsertValues();
     }
 
-    private function buildUpdate() {
+    private function buildUpdate()
+    {
         $this->SQL = "UPDATE " . $this->table;
         $this->buildUpdateSet();
         $this->buildWhere();
     }
 
-    private function buildDelete() {
+    private function buildDelete()
+    {
         $this->SQL = "DELETE ";
         $this->buildFrom();
         $this->buildWhere();
     }
 
-    private function buildFrom() {
+    private function buildFrom()
+    {
         $this->SQL .= " FROM " . $this->table;
     }
 
-    private function buildWhere(): void {
+    private function buildWhere(): void
+    {
         if (!empty($this->wheres)) {
             foreach ($this->wheres as $index => $where_instance) {
                 if ($index == 0) {
@@ -345,12 +378,14 @@ class BaseQuery {
     }
 
 
-    private function buildGroupBy() {
+    private function buildGroupBy()
+    {
         if (!empty($this->groupsBy))
             $this->SQL .= " GROUP BY " . implode(", ", $this->groupsBy);
     }
 
-    private function buildOrderBy() {
+    private function buildOrderBy()
+    {
         if (!empty($this->ordersBy)) {
 
             $orders_by = [];
@@ -362,7 +397,8 @@ class BaseQuery {
     }
 
 
-    private function buildLimitOffset() {
+    private function buildLimitOffset()
+    {
         if ($this->limit > 0)
             $this->SQL .= " LIMIT " . $this->limit;
 
@@ -370,7 +406,8 @@ class BaseQuery {
             $this->SQL .= " OFFSET " . $this->offset;
     }
 
-    private function buildInsertValues() {
+    private function buildInsertValues()
+    {
         $this->SQL .= " (";
         $arr_keys = array_keys($this->inputs);
         $last_key = end($arr_keys);
@@ -390,7 +427,8 @@ class BaseQuery {
         }
     }
 
-    private function buildUpdateSet() {
+    private function buildUpdateSet()
+    {
         $this->SQL .= " SET";
         $end_key = array_keys($this->inputs);
         $last_key = end($end_key);
@@ -405,15 +443,24 @@ class BaseQuery {
     }
 
 
-    private function touchModel($called_class ,$created_at = false){
-        if($this->entity::$timestamps){
+    private function touchModel($created_at = false)
+    {
+        if ($this->entity::$timestamps) {
             $date = date("Y-m-d H:i:s");
-            if($created_at){
-                $this->inputs = array_merge($this->inputs, ['updated_at' => $date,'created_at' => $date]);
-            }else{
+            if ($created_at) {
+                $this->inputs = array_merge($this->inputs, ['updated_at' => $date, 'created_at' => $date]);
+            } else {
                 $this->inputs = array_merge($this->inputs, ['updated_at' => $date]);
             }
         }
-    } 
-    
+    }
+
+    protected function getLastInsertedInstance(){
+        return $this->entity::orderBy($this->entity::$primaryKey, 'DESC')->limit(1)->first();
+    }
+
+    protected function getLastInsertedId(){
+        $obj = $this->entity::orderBy($this->entity::$primaryKey, 'DESC')->limit(1)->first();
+        return is_null($obj) ? null : $obj->{$this->entity::$primaryKey}; 
+    }
 }

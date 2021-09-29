@@ -34,7 +34,7 @@ abstract class Model extends QueryBuilder implements \JsonSerializable {
     
     public function getPrimaryKeyValue()
     {
-        return $this->{static::$primaryKey};
+        return $this->{static::$primaryKey} ?? 0;
     }
 
     protected function setPrimaryKeyValue(int $value)
