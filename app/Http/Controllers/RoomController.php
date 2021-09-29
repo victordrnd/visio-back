@@ -5,10 +5,10 @@ namespace Http\Controllers;
 use Framework\Core\App;
 use Framework\Core\Http\Request;
 use Framework\Core\Http\Resources\JsonResource;
-use Models\User;
+use Models\Room;
 use Framework\Facades\Hash;
 
-class UserController extends Controller
+class RoomController extends Controller
 {
 
 
@@ -20,12 +20,13 @@ class UserController extends Controller
      */
     public function show(int $id)
     {
-        $user = User::where('id', $id)->with('rooms')->firstOrFail();
+        $user = Room::where('id', $id)->firstOrFail();
         return response()->json($user);
     }
 
-    public function rooms(){
-        return auth()->user()->load('rooms');
+    
+    public function list(){
+        return Room::all();
     }
 
     /**
@@ -35,13 +36,11 @@ class UserController extends Controller
      * @return void
      */
     public function store(Request $req){
-        $user = User::create([
-            'firstname' =>"Victor",
-            'lastname' => "Durand",
-            'email' => "vic20016@gmail.com",
-            'password' => Hash::make("test")
+        $room = Room::create([
+            'label' => $req->label,
+            'picture' => $req->picture
         ]);
-        return response()->json($user);
+        return response()->json($room);
     }
 
     /**

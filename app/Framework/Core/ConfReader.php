@@ -30,7 +30,7 @@ abstract class ConfReader {
         if (isset(self::$config[$value])) {
             return self::$config[$value];
         } else {
-            throw new \Exception("La clé de configuration demandé n'existe pas", 1);
+            throw new \Exception("La clé de configuration $value demandé n'existe pas", 1);
         }
     }
 

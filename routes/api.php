@@ -13,32 +13,14 @@ Router::group('/auth', function (){
 });
 
 
-// Router::group(['prefix' => '/users', 'middleware' => 'auth:api'], function(){
-//     Router::get("/", "AuthController@getAll");
-// });
 
 Router::group(["prefix" => '/users'], function(){
     Router::get('/{id}', 'UserController@show');
     Router::post('/', "UserController@store");
+    Router::get('/my/rooms',    'UserController@rooms');
 });
 
-
-
-Router::group('/city', function (){
-    Router::get('/show/{id}', 'CityController@show');
-    Router::post('/add', 'CityController@create');
-    Router::post('/update/{id}', 'CityController@update');
-    Router::get('/delete/{id}', 'CityController@delete');
-    Router::post('/search', 'CityController@search');
-});
-
-Router::group('/country', function (){
-    Router::get('/', 'CountryController@showAll');
-    Router::get('/show/{id}', 'CountryController@show');
-    Router::post('/add', 'CountryController@create');
-    Router::post('/update/{id}', 'CountryController@update');
-    Router::get('/delete/{id}', 'CountryController@delete');
-});
+Router::group(["prefix" => '/my',] )
 
 
 Router::set404(function () {

@@ -22,4 +22,7 @@ class Room extends Model
      * @var array
      */
     protected static $attributes = ['label', 'picture'];
+
+
+    
 }
