@@ -223,6 +223,14 @@ class BaseQuery
         return $object;
     }
 
+    public function exists(){
+        $obj = $this->first();
+        if(is_null($obj) || is_bool($obj)){
+            return false;
+        }
+        return true;
+    }
+
     public function firstOrFail(){
         $object = $this->first();
         if(is_null($object) || is_bool($object)){

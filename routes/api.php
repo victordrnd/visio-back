@@ -1,9 +1,13 @@
 <?php
 use Framework\Routing\Router;
 
+Router::options('.*', function() {
+   return "done";
+});
+
 Router::group('/auth', function (){
-    Router::post('/signin', 'AuthController@verifySignIn');
-    Router::post('/register', 'AuthController@verifyRegister');
+    Router::post('/register', 'AuthController@register');
+    //Router::post('/register', 'AuthController@verifyRegister');
     Router::post('/login', 'AuthController@login');
     Router::get('/current', 'AuthController@current');
 });

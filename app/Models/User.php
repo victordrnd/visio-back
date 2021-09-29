@@ -32,8 +32,12 @@ class User extends Model
     protected $hidden = ["password"]; 
 
 
-    public function room(){
-        return $this->hasMany(UserRoom::class);
+    // public function rooms(){
+    //     return $this->hasMany(UserRoom::class);
+    // }
+
+    public function rooms(){
+        return $this->hasManyThrough(Room::class, UserRoom::class);
     }
 
     public static function getJWTIdentifier() : string

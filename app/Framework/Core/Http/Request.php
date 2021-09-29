@@ -48,12 +48,14 @@ class Request {
         if (isset($_SERVER['QUERY_STRING'])) {
             $data = $_SERVER['QUERY_STRING'];
             parse_str($data, $this->params);
-            foreach ($this->params as $param => &$value) {
-                if (!is_array($this->params)) {
-                    $value = htmlspecialchars($value);
-                }
-                $this->{$param} = $value;
+        }
+        $post_data = json_decode(file_get_contents('php://input'), true);
+        $this->params = array_merge($post_data, $this->params);
+        foreach ($this->params as $param => &$value) {
+            if (!is_array($this->params)) {
+                $value = htmlspecialchars($value);
             }
+            $this->{$param} = $value;
         }
     }
 

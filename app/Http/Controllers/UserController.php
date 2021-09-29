@@ -24,8 +24,7 @@ class UserController extends Controller
      */
     public function show(int $id)
     {
-        $user = User::where('id', $id)->firstOrFail();
-        $user->load('room');
+        $user = User::where('id', $id)->with('rooms')->firstOrFail();
         return response()->json($user);
     }
 

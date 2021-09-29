@@ -2,12 +2,14 @@
 
 namespace Framework\Core;
 
+use ArrayIterator;
 use ArrayObject;
+use Iterator;
 
-class Collection extends ArrayObject implements \JsonSerializable{
+class Collection extends ArrayObject implements \JsonSerializable, \IteratorAggregate{
 
     protected $array = [];
-
+    private $index = 0;
 
     public function __construct(array $collection) {
         $this->array = $collection;
@@ -46,6 +48,12 @@ class Collection extends ArrayObject implements \JsonSerializable{
         }
         return $collection;
     }
+
+
+    public function getIterator() {
+        return new ArrayIterator($this->array);
+    }
+
 
     public function jsonSerialize(){
         return $this->array;

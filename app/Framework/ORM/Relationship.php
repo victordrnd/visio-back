@@ -65,18 +65,28 @@ trait Relationship
     /**
      * Many to Many
      *
-     * @param class $entity
+     * @param string $entity
      * @param class $AssociationEntity
      * @param [type] $foreign_key
      * @param [type] $localkey
      * @return void
      */
-    protected function hasManyThrough($entity, $AssociationEntity,string $foreign_key,string $localkey)
+    protected function hasManyThrough(string $entity, $associationEntity,string $foreign_key ="",string $association_related_key ="", string $localkey = "", string $relatedkey ="")
     {
+        if(empty($localkey))
+            $localkey = get_called_class()::$primaryKey;
+        
+        if(empty($relatedkey))
+            $relatedkey = $entity::$primaryKey;
+
+        if(empty($foreign_key))
+            $foreign_key = $this->generateKeyName($entity);
+        if(empty($association_related_key))
+            $association_related_key = $this->generateKeyName(get_called_class());
         $values = [];
-        $AssociationValues = $AssociationEntity::where($localkey, $this->{$localkey})->get();
-        foreach($AssociationValues as $AssociationRow){
-            $values[] = $entity::find($AssociationRow->{$foreign_key});
+        $associationValues = $associationEntity::where($association_related_key, $this->{$localkey})->get();
+        foreach($associationValues as $associationRow){
+            $values[] = $entity::where($relatedkey, $associationRow->{$foreign_key})->first();
         }
         return $values;
     }
