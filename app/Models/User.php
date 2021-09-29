@@ -31,10 +31,6 @@ class User extends Model
     
     protected $hidden = ["password"]; 
 
-    // public function roles(){
-    //     return $this->hasManyThrough(Role::class, UserRole::class, 'role_id', 'user_id');
-    // }
-
 
     public function room(){
         return $this->hasMany(UserRoom::class);
