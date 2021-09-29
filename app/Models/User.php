@@ -42,7 +42,7 @@ class User extends Model
 
     public static function getJWTIdentifier() : string
     {
-        return "login";
+        return "email";
     }
 
 

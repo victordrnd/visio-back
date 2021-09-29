@@ -38,8 +38,7 @@ class Auth {
 
 
     public static function attempt(array $credentials) {
-        if(count($credentials) < 2)
-            return false;
+        if(count($credentials) == 2)
             $user = User::where(User::getJWTIdentifier(), $credentials[0])->first();
             if (!is_null($user)) {
                 if (Hash::check($credentials[1], $user->password)) {
