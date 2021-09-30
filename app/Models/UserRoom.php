@@ -21,5 +21,5 @@ class UserRoom extends Model
      *
      * @var array
      */
-    protected static $attributes = ['user_id', 'room_id'];
+    protected static $attributes = ['user_id', 'room_id', 'last_read'];
 }

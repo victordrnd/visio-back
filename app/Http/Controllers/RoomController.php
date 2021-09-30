@@ -7,6 +7,7 @@ use Framework\Core\Http\Request;
 use Framework\Core\Http\Resources\JsonResource;
 use Models\Room;
 use Framework\Facades\Hash;
+use Models\UserRoom;
 
 class RoomController extends Controller
 {
@@ -26,7 +27,7 @@ class RoomController extends Controller
 
     
     public function list(){
-        return Room::all();
+        return Room::orderBy('updated_at', 'DESC')->get();
     }
 
     /**
@@ -37,9 +38,18 @@ class RoomController extends Controller
      */
     public function store(Request $req){
         $room = Room::create([
-            'label' => $req->label,
-            'picture' => $req->picture
+            'label' => null,
+            'picture' => null
         ]);
+        $req->user_ids[] = auth()->user()->id;
+        foreach($req->user_ids as $user_id){
+            UserRoom::create([
+                'user_id' => $user_id,
+                'room_id' => $room->id
+            ]);
+        }
+        return $room;
+
         return response()->json($room);
     }
 
