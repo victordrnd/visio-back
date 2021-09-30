@@ -20,8 +20,8 @@ class RoomController extends Controller
      */
     public function show(int $id)
     {
-        $user = Room::where('id', $id)->firstOrFail();
-        return response()->json($user);
+        $room = Room::where('id', $id)->with('messages')->firstOrFail();
+        return response()->json($room);
     }
 
     

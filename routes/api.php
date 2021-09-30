@@ -1,26 +1,29 @@
 <?php
+
 use Framework\Routing\Router;
 
-Router::options('.*', function() {
-   return "done";
-});
-
-Router::group('/auth', function (){
+Router::group('/auth', function () {
     Router::post('/register', 'AuthController@register');
-    //Router::post('/register', 'AuthController@verifyRegister');
     Router::post('/login', 'AuthController@login');
     Router::get('/current', 'AuthController@current');
 });
 
 
 
-Router::group(["prefix" => '/users'], function(){
-    Router::get('/{id}', 'UserController@show');
-    Router::post('/', "UserController@store");
-    Router::get('/my/rooms',    'UserController@rooms');
+Router::group(["prefix" => '/users'], function () {
+    Router::get('/',            'UserController@list');
+    Router::get('/{id}',        'UserController@show');
+    Router::post('/',           "UserController@store");
 });
 
-Router::group(["prefix" => '/my',] )
+
+// Router::group(["prefix" => 'rooms'], function(){
+//     Router::get('/{id}',        'RoomController@show');
+// });
+
+Router::group(["prefix" => '/my', "middleware" => "auth:api"], function () {
+    Router::get('/rooms',   'UserController@rooms');
+});
 
 
 Router::set404(function () {

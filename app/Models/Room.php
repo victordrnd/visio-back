@@ -24,5 +24,9 @@ class Room extends Model
     protected static $attributes = ['label', 'picture'];
 
 
-    
+    public function messages(){
+        return $this->hasMany(Message::class);
+    }
+
+
 }

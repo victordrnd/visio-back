@@ -56,7 +56,9 @@ class Request
             parse_str($data, $this->params);
         }
         $post_data = json_decode(file_get_contents('php://input'), true);
-        $this->params = array_merge($post_data, $this->params);
+        if(!is_null($post_data)){
+            $this->params = array_merge($post_data, $this->params);
+        }
         foreach ($this->params as $param => &$value) {
             if (!is_array($this->params)) {
                 $value = htmlspecialchars($value);

@@ -2,18 +2,16 @@
 
 
 
-namespace Http\Resources\City;
+namespace Http\Resources\User;
 use Framework\Core\Http\Request;
-use Framework\Core\Http\Resources\JsonResource;
 use Framework\Core\Http\Resources\ResourceCollection;
 
-class CityResourceCollection extends ResourceCollection{
-
+class UserResourceCollection extends ResourceCollection{
 
     public function toArray(Request $req){
 
         return $this->collection->map(function($el) {
-            return (new CityResource($el));
+            return (new UserResource($el));
         });
     }
 
