@@ -4,7 +4,7 @@ namespace Framework\ORM\Query;
 
 class WhereQuery{
 
-    const OPERATORS = ['=', '>=', '>', '<', '<=', '!=', 'LIKE', 'NOT LIKE', "IS NULL", "IS NOT NULL"];
+    const OPERATORS = ['=', '>=', '>', '<', '<=', '!=', 'LIKE', 'NOT LIKE', "IS NULL", "IS NOT NULL", "IN", "NOT IN"];
 
     public $column = "";
 
