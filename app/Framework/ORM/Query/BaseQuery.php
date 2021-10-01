@@ -13,12 +13,11 @@ class BaseQuery
 
     private static $instance = null;
 
-
     public function __construct($entity = null)
     {
-        if(is_null($entity)){
+        if (is_null($entity)) {
             $this->entity = get_called_class();
-        }else{
+        } else {
             $this->entity = $entity;
         }
         $this->table = self::table($entity);
@@ -39,6 +38,8 @@ class BaseQuery
 
     private $wheres = [];
 
+    private $wherehas = [];
+
     private $ordersBy = [];
 
     private $groupsBy = [];
@@ -55,7 +56,7 @@ class BaseQuery
     private $table = "";
 
     private $values_bindings = [];
-    private $entity;
+    public string $entity;
 
 
     private $SQL;
@@ -127,6 +128,14 @@ class BaseQuery
             $operator = "=";
         }
         $instance->wheres[] = new WhereQuery($column, $operator, $value);
+        return $instance;
+    }
+
+
+    public static function whereHas($relation, callable $callback = null)
+    {
+        $instance = self::get_instance(get_called_class());
+        $instance->wherehas[$relation] = $callback;
         return $instance;
     }
 
@@ -223,17 +232,19 @@ class BaseQuery
         return $object;
     }
 
-    public function exists(){
+    public function exists()
+    {
         $obj = $this->first();
-        if(is_null($obj) || is_bool($obj)){
+        if (is_null($obj) || is_bool($obj)) {
             return false;
         }
         return true;
     }
 
-    public function firstOrFail(){
+    public function firstOrFail()
+    {
         $object = $this->first();
-        if(is_null($object) || is_bool($object)){
+        if (is_null($object) || is_bool($object)) {
             throw new ModelNotFoundException;
         }
         return $object;
@@ -338,6 +349,8 @@ class BaseQuery
         //WHERE
         $this->SQL .= $this->buildWhere();
 
+        $this->SQL .= $this->buildWhereHas();
+
         //GROUP BY
         $this->SQL .= $this->buildGroupBy();
 
@@ -391,6 +404,27 @@ class BaseQuery
                     $this->SQL .= $where_instance->column . " " . $where_instance->operator . " ?";
                     $this->values_bindings[] = $where_instance->value;
                 }
+            }
+        }
+    }
+
+
+    private function buildWhereHas(): void
+    {
+        if (!empty($this->wherehas)) {
+            foreach ($this->wherehas as $relation => $callback) {
+                if (!strpos($this->SQL, 'WHERE')) {
+                    $this->SQL .= " WHERE ";
+                } else {
+                    $this->SQL .= " AND ";
+                }
+                $this->SQL .= " EXISTS (";
+                //TODO : fix call_user_func
+                $relationship = call_user_func(array($this, $relation));
+                $query = $callback($relationship->query);
+                $this->SQL .= $query->getRawQuery();
+                $this->SQl .= ")";
+                var_dump($relationship);
             }
         }
     }
@@ -461,6 +495,13 @@ class BaseQuery
     }
 
 
+    public function getRawQuery()
+    {
+        $this->build();
+        return $this->SQL;
+    }
+
+
     private function touchModel($created_at = false)
     {
         if ($this->entity::$timestamps) {
@@ -473,12 +514,14 @@ class BaseQuery
         }
     }
 
-    protected function getLastInsertedInstance(){
+    protected function getLastInsertedInstance()
+    {
         return $this->entity::orderBy($this->entity::$primaryKey, 'DESC')->limit(1)->first();
     }
 
-    protected function getLastInsertedId(){
+    protected function getLastInsertedId()
+    {
         $obj = $this->entity::orderBy($this->entity::$primaryKey, 'DESC')->limit(1)->first();
-        return is_null($obj) ? null : $obj->{$this->entity::$primaryKey}; 
+        return is_null($obj) ? null : $obj->{$this->entity::$primaryKey};
     }
 }

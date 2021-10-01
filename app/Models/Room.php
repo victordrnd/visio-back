@@ -28,5 +28,9 @@ class Room extends Model
         return $this->hasMany(Message::class);
     }
 
+    public function users(){
+        return $this->hasManyThrough(User::class, UserRoom::class);
+    }
+
 
 }

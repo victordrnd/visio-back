@@ -3,6 +3,9 @@
 
 namespace Framework\ORM;
 
+use Framework\ORM\Relationships\MultipleRelationship;
+use Framework\ORM\Relationships\UniqueRelationship;
+
 trait Relationship
 {
 
@@ -14,13 +17,14 @@ trait Relationship
      * @param string $foreign_key
      * @return boolean
      */
-    protected function hasOne($entity, string $foreign_key = "", string $localkey = "")
+    protected function hasOne($entity, string $foreign_key = "", string $localkey = "") : UniqueRelationship
     {
         if (empty($foreign_key))
             $foreign_key = $this->generateKeyName(get_called_class());
         if (empty($localkey))
             $localkey = get_called_class()::$primaryKey;
-        return $entity::where($foreign_key, $this->{$localkey})->first();
+        return new UniqueRelationship($entity::where($foreign_key, $this->{$localkey}));
+        //return $entity::where($foreign_key, $this->{$localkey})->first();
     }
 
 
@@ -37,7 +41,8 @@ trait Relationship
     {
         if (empty($local_key))
             $local_key = $this->generateKeyName($entity);
-        return $entity::where($related_key, $this->{$local_key})->first();
+        return new UniqueRelationship($entity::where($related_key, $this->{$local_key}));
+        //return $entity::where($related_key, $this->{$local_key})->first();
     }
 
 
@@ -47,10 +52,10 @@ trait Relationship
     /**
      * One to Many
      *
-     * @param class $entity
+     * @param string $entity
      * @param string $localkey
      * @param string $foreign_key
-     * @return boolean
+     * @return Collection
      */
     protected function hasMany($entity, string $localkey = "", string $foreign_key = "")
     {
@@ -58,8 +63,8 @@ trait Relationship
             $foreign_key = $this->generateKeyName(get_called_class());
         if (empty($localkey))
             $localkey = get_called_class()::$primaryKey;
-
-        return $entity::where($foreign_key, $this->{$localkey})->get();
+        return new UniqueRelationship($entity::where($foreign_key, $this->{$localkey}), true);
+        // return $entity::where($foreign_key, $this->{$localkey})->get();
     }
 
 
@@ -84,12 +89,12 @@ trait Relationship
             $foreign_key = $this->generateKeyName($entity);
         if (empty($association_related_key))
             $association_related_key = $this->generateKeyName(get_called_class());
-        $values = [];
+        $queries = [];
         $associationValues = $associationEntity::where($association_related_key, $this->{$localkey})->get();
         foreach ($associationValues as $associationRow) {
-            $values[] = $entity::where($relatedkey, $associationRow->{$foreign_key})->first();
+            $queries[] = $entity::where($relatedkey, $associationRow->{$foreign_key}); //->first();
         }
-        return $values;
+        return new MultipleRelationship($queries);
     }
 
 

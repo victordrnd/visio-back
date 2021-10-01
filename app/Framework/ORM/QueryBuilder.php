@@ -56,7 +56,7 @@ class QueryBuilder extends BaseQuery
         }
         if ($this->getPrimaryKeyValue() != 0) {
             return !is_null($this->update($values)) ? true : null;
-        }else{
+        } else {
             $item = self::create($values);
             if (!is_null($item)) {
                 $this->setPrimaryKeyValue($item->getLastInsertedId());
@@ -64,7 +64,6 @@ class QueryBuilder extends BaseQuery
             }
             return false;
         }
-
     }
 
 
@@ -116,7 +115,7 @@ class QueryBuilder extends BaseQuery
                     $nested_relationships[$parent][] = $relation;
                 } else {
                     if (method_exists($this, $relation)) {
-                        $this->{$relation} = call_user_func(array($this, $relation));
+                        $this->{$relation} = call_user_func(array($this, $relation))->execute();
                     } else {
                         throw new RelationNotFoundException($relation, get_class($this));
                     }

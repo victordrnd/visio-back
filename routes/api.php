@@ -15,6 +15,7 @@ Router::group(["prefix" => '/my', "middleware" => "auth:api"], function () {
 
 Router::group(["prefix" => '/rooms', "middleware" => "auth:api"], function () {
     Router::get('/{id}',        'RoomController@show');
+    Router::post('/',           'RoomController@store');
 });
 
 

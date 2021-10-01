@@ -2,12 +2,9 @@
 
 namespace Http\Controllers;
 
-use Framework\Core\App;
-use Framework\Core\Http\Request;
-use Framework\Core\Http\Resources\JsonResource;
 use Models\User;
-use Framework\Facades\Hash;
 use Http\Resources\User\UserResourceCollection;
+use Models\Room;
 
 class UserController extends Controller
 {
@@ -20,8 +17,12 @@ class UserController extends Controller
 
 
 
-    public function rooms() : User{
-        return auth()->user()->load('rooms');
+    public function rooms() {
+        return Room::whereHas('user_rooms', function($query) {
+            var_dump($query);
+            return $query;
+        })->get();
+
     }
 
 
