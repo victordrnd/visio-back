@@ -5,6 +5,7 @@ namespace Http\Controllers;
 use Models\User;
 use Http\Resources\User\UserResourceCollection;
 use Models\Room;
+use Models\UserRoom;
 
 class UserController extends Controller
 {
@@ -17,18 +18,20 @@ class UserController extends Controller
 
 
 
-    public function rooms() {
-        return Room::whereHas('user_rooms', function($query) {
-            var_dump($query);
-            return $query;
-        })->get();
-
+    public function rooms()
+    {
+        return Room::whereIn(
+            "id",
+            [1]
+            // UserRoom::where('user_id', auth()->user()->id)->get()->pluck('room_id')
+        )->get();
     }
 
 
-    
 
-    public function list(){
+
+    public function list()
+    {
         return new UserResourceCollection(User::all());
     }
 }

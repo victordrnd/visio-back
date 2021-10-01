@@ -16,7 +16,6 @@ class UniqueRelationship implements RelationshipInterface
     {
         $this->query = $query;
         $this->entity = $query->entity;
-        var_dump($this->entity);
         $this->is_collection = $collection;
     }
 

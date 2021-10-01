@@ -12,7 +12,7 @@ use Models\Permission;
 class Auth {
 
     private static $user = null;
-    public function check() {
+    public static function check() {
         if(!is_null(self::user())){
             return true;
         }

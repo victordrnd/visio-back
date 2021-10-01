@@ -17,7 +17,7 @@ trait Relationship
      * @param string $foreign_key
      * @return boolean
      */
-    protected function hasOne($entity, string $foreign_key = "", string $localkey = "") : UniqueRelationship
+    protected function hasOne($entity, string $foreign_key = "", string $localkey = ""): UniqueRelationship
     {
         if (empty($foreign_key))
             $foreign_key = $this->generateKeyName(get_called_class());
@@ -94,7 +94,7 @@ trait Relationship
         foreach ($associationValues as $associationRow) {
             $queries[] = $entity::where($relatedkey, $associationRow->{$foreign_key}); //->first();
         }
-        return new MultipleRelationship($queries);
+        return new MultipleRelationship($queries, new UniqueRelationship($associationEntity::where($association_related_key, $this->{$localkey}), true));
     }
 
 

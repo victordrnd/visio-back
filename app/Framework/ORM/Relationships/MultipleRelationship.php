@@ -7,16 +7,18 @@ use Framework\Core\Contracts\Relationship\RelationshipInterface;
 class MultipleRelationship implements RelationshipInterface
 {
 
-    public array $queries;
-    public function __construct(array $queries)
+    public array $children_queries;
+    public UniqueRelationship $query;
+    public function __construct(array $children_queries, UniqueRelationship $parent_query)
     {
-        $this->queries = $queries;
+        $this->query = $parent_query;
+        $this->children_queries = $children_queries;
     }
 
 
     public function execute(){
         $values = [];
-        foreach($this->queries as $query){
+        foreach($this->children_queries as $query){
             $values[] = $query->first();
         }
         return $values;

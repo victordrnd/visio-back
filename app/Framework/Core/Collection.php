@@ -15,6 +15,14 @@ class Collection extends ArrayObject implements \JsonSerializable, \IteratorAggr
         $this->array = $collection;
     }
 
+    public function toArray(){
+        return $this->array;
+    }
+
+    public function pluck($field){
+        return array_column($this->array, $field);
+    }
+
     public function first() {
         return isset($this->array[0]) ? $this->array[0] : null;
     }
