@@ -26,10 +26,12 @@ CREATE TABLE `messages` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `type` enum('text','file') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'text',
   `message` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_id` int(10) unsigned NOT NULL,
+  `room_id` int(10) unsigned NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -38,6 +40,7 @@ CREATE TABLE `messages` (
 
 LOCK TABLES `messages` WRITE;
 /*!40000 ALTER TABLE `messages` DISABLE KEYS */;
+INSERT INTO `messages` VALUES (1,'text','jkhkjhjk',1,1,'2021-09-30 11:23:51','2021-09-30 11:23:51'),(2,'text','ruidsfhqkdsq',1,1,'2021-09-30 11:30:12','2021-09-30 11:30:12'),(3,'text','ruidsfhqkdsqdqqsdsq',1,1,'2021-09-30 11:30:14','2021-09-30 11:30:14'),(4,'text','ruidsfhqkdsqdqqsdsqdsqdsqdsq',1,1,'2021-09-30 11:30:14','2021-09-30 11:30:14'),(5,'text','ruidsfhqkdsqdqqsdsqdsqdsqdsqdqs',1,1,'2021-09-30 11:30:15','2021-09-30 11:30:15'),(6,'text','dqsmkdsqdsq',1,1,'2021-09-30 11:30:33','2021-09-30 11:30:33'),(7,'text','dqsdqsdqs',1,1,'2021-09-30 11:30:33','2021-09-30 11:30:33'),(8,'text','dqsdsq',1,1,'2021-09-30 11:30:34','2021-09-30 11:30:34'),(9,'text','lerzjrzlkezre',1,1,'2021-09-30 11:30:42','2021-09-30 11:30:42'),(10,'text','rzerzerez',1,1,'2021-09-30 11:30:43','2021-09-30 11:30:43'),(11,'text','gtbedhhtrrthbrthtrhfhytyht',1,1,'2021-09-30 13:03:36','2021-09-30 13:03:36'),(12,'text','jhgjh,jh,hj,jhk',1,1,'2021-09-30 13:03:38','2021-09-30 13:03:38'),(13,'text','dsqdqsdsq',1,1,'2021-10-01 13:02:18','2021-10-01 13:02:18'),(14,'text','dsqdqsqsd',1,1,'2021-10-01 13:02:19','2021-10-01 13:02:19'),(15,'text','dsd',1,1,'2021-10-01 13:02:19','2021-10-01 13:02:19'),(16,'text','sd',1,1,'2021-10-01 13:02:20','2021-10-01 13:02:20'),(17,'text','ds',1,1,'2021-10-01 13:02:20','2021-10-01 13:02:20'),(18,'text','ds',1,1,'2021-10-01 13:02:20','2021-10-01 13:02:20'),(19,'text','d',1,1,'2021-10-01 13:02:20','2021-10-01 13:02:20'),(20,'text','s',1,1,'2021-10-01 13:02:21','2021-10-01 13:02:21'),(21,'text','s',1,1,'2021-10-01 13:02:21','2021-10-01 13:02:21'),(22,'text','d',1,1,'2021-10-01 13:02:21','2021-10-01 13:02:21'),(23,'text','sdsd',1,1,'2021-10-01 13:02:22','2021-10-01 13:02:22'),(24,'text','sddsqdsq',1,1,'2021-10-01 13:02:43','2021-10-01 13:02:43'),(25,'text','dqs',1,1,'2021-10-01 13:02:43','2021-10-01 13:02:43'),(26,'text','dsq',1,1,'2021-10-01 13:02:44','2021-10-01 13:02:44'),(27,'text','d',1,1,'2021-10-01 13:02:44','2021-10-01 13:02:44'),(28,'text','sqd',1,1,'2021-10-01 13:02:44','2021-10-01 13:02:44'),(29,'text','sq',1,1,'2021-10-01 13:02:44','2021-10-01 13:02:44'),(30,'text','d',1,1,'2021-10-01 13:02:44','2021-10-01 13:02:44'),(31,'text','qsd',1,1,'2021-10-01 13:02:45','2021-10-01 13:02:45'),(32,'text','qsd',1,1,'2021-10-01 13:02:45','2021-10-01 13:02:45'),(33,'text','sq',1,1,'2021-10-01 13:02:45','2021-10-01 13:02:45');
 /*!40000 ALTER TABLE `messages` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -53,7 +56,7 @@ CREATE TABLE `migrations` (
   `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -62,7 +65,7 @@ CREATE TABLE `migrations` (
 
 LOCK TABLES `migrations` WRITE;
 /*!40000 ALTER TABLE `migrations` DISABLE KEYS */;
-INSERT INTO `migrations` VALUES (1,'2014_10_12_000000_create_users_table',1),(2,'2021_09_27_142727_create_rooms_table',1),(3,'2021_09_27_142846_create_user_rooms_table',1),(4,'2021_09_27_142930_create_messages_table',1);
+INSERT INTO `migrations` VALUES (9,'2014_10_12_000000_create_users_table',1),(10,'2021_09_27_142727_create_rooms_table',1),(11,'2021_09_27_142846_create_user_rooms_table',1),(12,'2021_09_27_142930_create_messages_table',1);
 /*!40000 ALTER TABLE `migrations` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -80,7 +83,7 @@ CREATE TABLE `rooms` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -89,7 +92,7 @@ CREATE TABLE `rooms` (
 
 LOCK TABLES `rooms` WRITE;
 /*!40000 ALTER TABLE `rooms` DISABLE KEYS */;
-INSERT INTO `rooms` VALUES (1,'test','url',NULL,NULL);
+INSERT INTO `rooms` VALUES (1,'Tristan Chretien','url',NULL,NULL),(2,'','','2021-10-01 13:23:26','2021-10-01 13:23:26'),(3,'','','2021-10-01 13:24:43','2021-10-01 13:24:43'),(4,'','','2021-10-01 13:25:24','2021-10-01 13:25:24');
 /*!40000 ALTER TABLE `rooms` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -107,7 +110,7 @@ CREATE TABLE `user_rooms` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -116,7 +119,7 @@ CREATE TABLE `user_rooms` (
 
 LOCK TABLES `user_rooms` WRITE;
 /*!40000 ALTER TABLE `user_rooms` DISABLE KEYS */;
-INSERT INTO `user_rooms` VALUES (1,49,1,NULL,NULL);
+INSERT INTO `user_rooms` VALUES (1,1,1,NULL,NULL),(2,2,4,'2021-10-01 13:25:24','2021-10-01 13:25:24'),(3,1,4,'2021-10-01 13:25:24','2021-10-01 13:25:24');
 /*!40000 ALTER TABLE `user_rooms` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -137,7 +140,7 @@ CREATE TABLE `users` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_email_unique` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -146,7 +149,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (45,'','','','','2021-09-29 07:19:54','2021-09-29 07:19:54'),(49,'gne','Durand','vic200dd16jjdhhdd@gmail.com','$2y$06$j1.eXTLbXyhYQnw5dZ2jLeepIzweKWXDwky2cfj.S5OOcto609C2e','2021-09-29 07:21:07','2021-09-29 07:27:31'),(51,'Victor','Durand','vic20016@gmail.com','$2y$06$BrvW.e7dX3LRO9PmBMQGouu4ysAFhdEzJ/vcqxZUVVblBew/54WVy','2021-09-29 12:52:10','2021-09-29 12:52:10');
+INSERT INTO `users` VALUES (1,'Victor','Durand','vic20016@gmail.com','$2y$06$jDWHlrrurCiW5NuhrYxpDeZ1QU96TlSBc3tk3YJGPepV2Rm62uL1K','2021-09-30 09:35:27','2021-09-30 09:35:27'),(2,'titi','titi','clio@gmail.com','$2y$06$vNxzu7N9.GWc8zC1p3bHt.ag7d5.ag33mAepiDkOEG0eB6EcZ9ipy','2021-10-01 13:16:03','2021-10-01 13:16:03');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -159,4 +162,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-09-29 15:01:32
+-- Dump completed on 2021-10-01 20:45:01
