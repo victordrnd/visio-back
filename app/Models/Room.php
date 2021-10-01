@@ -25,12 +25,13 @@ class Room extends Model
 
 
     public function messages(){
-        return $this->hasMany(Message::class);
+        return $this->hasMany(Message::class)->limit(30)->orderBy('id', 'DESC');
     }
 
     public function users(){
-        return $this->hasManyThrough(User::class, UserRoom::class);
+        return $this->hasMany(UserRoom::class)->select('user_id');
     }
+
 
 
 }

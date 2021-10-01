@@ -81,7 +81,6 @@ class BaseQuery
         $instance->inputs = $inputs;
         $instance->touchModel(true);
         $instance->build();
-        var_dump($instance->SQL, $instance->values_bindings);
         $cnx = Environment::getInstance()->cnx;
         $cnx->setAttribute(\PDO::ATTR_EMULATE_PREPARES, TRUE);
         $statement = $cnx->prepare($instance->SQL);
@@ -294,7 +293,7 @@ class BaseQuery
         $this->build();
         $statement = Environment::getInstance()->cnx->prepare($this->SQL);
         $statement->execute($this->values_bindings);
-        if(!count($this->selects)){
+        if(!empty($this->selects)){
             $statement->setFetchMode(\PDO::FETCH_CLASS, $this->entity);
         }
         static::$instance = null;
