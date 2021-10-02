@@ -20,7 +20,9 @@ class Collection extends ArrayObject implements \JsonSerializable, \IteratorAggr
     }
 
     public function pluck($field){
-        return array_column($this->array, $field);
+        return $this->map(function($el) use ($field){
+            return $el->{$field};
+        });
     }
 
     public function first() {

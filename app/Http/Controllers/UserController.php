@@ -22,9 +22,8 @@ class UserController extends Controller
     {
         return Room::whereIn(
             "id",
-            [1]
-            // UserRoom::where('user_id', auth()->user()->id)->get()->pluck('room_id')
-        )->get();
+            UserRoom::where('user_id', auth()->user()->id)->get()->pluck('room_id')
+        )->with('last_message')->get();
     }
 
 

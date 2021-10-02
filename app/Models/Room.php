@@ -28,8 +28,12 @@ class Room extends Model
         return $this->hasMany(Message::class)->limit(30)->orderBy('id', 'DESC');
     }
 
+    public function last_message(){
+        return $this->hasOne(Message::class)->limit(1)->orderBy('id', 'DESC');
+    }
+
     public function users(){
-        return $this->hasMany(UserRoom::class)->select('user_id');
+        return $this->hasMany(UserRoom::class);
     }
 
 

@@ -168,7 +168,8 @@ class BaseQuery
         return $this;
     }
 
-    public static function whereIn($column, $values){
+    public static function whereIn($column, $values)
+    {
         $instance = self::get_instance(get_called_class());
         $instance->wheres[] = new WhereQuery($column, 'IN', $values);
         return $instance;
@@ -180,7 +181,8 @@ class BaseQuery
         return $this;
     }
 
-    public static function whereNotIn($column, $values){
+    public static function whereNotIn($column, $values)
+    {
         $instance = self::get_instance(get_called_class());
         $instance->wheres[] = new WhereQuery($column, 'NOT IN', $values);
         return $instance;
@@ -293,9 +295,7 @@ class BaseQuery
         $this->build();
         $statement = Environment::getInstance()->cnx->prepare($this->SQL);
         $statement->execute($this->values_bindings);
-        if(!empty($this->selects)){
-            $statement->setFetchMode(\PDO::FETCH_CLASS, $this->entity);
-        }
+        $statement->setFetchMode(\PDO::FETCH_CLASS, $this->entity);
         static::$instance = null;
         $items =  $statement->fetchAll();
         if (!empty($this->with)) {
@@ -432,17 +432,17 @@ class BaseQuery
                 if (in_array($where_instance->operator, ["IS NULL", "IS NOT NULL"])) {
                     $this->SQL .= $where_instance->column . " " . $where_instance->operator;
                 } else {
-                    if(is_array($where_instance->value)){
-                        $this->SQL .= $where_instance->column . " ". $where_instance->operator."( " ;
-                        foreach($where_instance->value as $index => $value){
-                            if($index == count($where_instance->value)-1){
+                    if (is_array($where_instance->value)) {
+                        $this->SQL .= $where_instance->column . " " . $where_instance->operator . "( ";
+                        foreach ($where_instance->value as $index => $value) {
+                            if ($index == count($where_instance->value) - 1) {
                                 $this->SQL .= " ? )";
-                            }else{
+                            } else {
                                 $this->SQL .= " ?,";
                             }
                             $this->values_bindings[] = $value;
                         }
-                    }else{
+                    } else {
                         $this->SQL .= $where_instance->column . " " . $where_instance->operator . " ?";
                         $this->values_bindings[] = $where_instance->value;
                     }
@@ -464,7 +464,7 @@ class BaseQuery
                 $this->SQL .= " EXISTS (";
                 $instance = self::get_instance(get_called_class());
                 $class = $instance->entity;
-                $relationship = call_user_func_array(array(new $class(), $relation), []);//(array($instance->entity, $relation));
+                $relationship = call_user_func_array(array(new $class(), $relation), []); //(array($instance->entity, $relation));
                 $query = $callback($relationship->query);
                 $this->SQL .= $query->getRawQuery();
                 $this->SQL .= ")";
