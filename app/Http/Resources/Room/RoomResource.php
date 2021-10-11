@@ -3,15 +3,17 @@
 
 
 namespace Http\Resources\Room;
+
 use Framework\Core\Http\Request;
 use Framework\Core\Http\Resources\JsonResource;
 use Framework\Core;
 use Models\UserRoom;
 
-class RoomResource extends JsonResource{
+class RoomResource extends JsonResource
+{
 
-
-    public function toArray(Request $req){
+    public function toArray(Request $req)
+    {
 
         return [
             'id' => $this->id,
@@ -21,5 +23,4 @@ class RoomResource extends JsonResource{
             'messages' => $this->messages
         ];
     }
-
 }
