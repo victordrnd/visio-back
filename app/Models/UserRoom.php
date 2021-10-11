@@ -22,4 +22,8 @@ class UserRoom extends Model
      * @var array
      */
     protected static $attributes = ['user_id', 'room_id', 'last_read'];
+
+    public function user(){
+        return $this->belongsTo(User::class, "user_id");
+    }
 }
