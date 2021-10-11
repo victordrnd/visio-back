@@ -7,6 +7,7 @@ use Framework\Core\Http\Request;
 use Framework\Core\Http\Resources\JsonResource;
 use Models\Room;
 use Framework\Facades\Hash;
+use Http\Resources\Room\RoomResource;
 use Models\UserRoom;
 
 class RoomController extends Controller
@@ -22,7 +23,7 @@ class RoomController extends Controller
     public function show(int $id)
     {
         $room = Room::where('id', $id)->with('messages')->firstOrFail();
-        return response()->json($room);
+        return new RoomResource($room);
     }
 
     
