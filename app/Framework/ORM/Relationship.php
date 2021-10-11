@@ -24,7 +24,6 @@ trait Relationship
         if (empty($localkey))
             $localkey = get_called_class()::$primaryKey;
         return new UniqueRelationship($entity::where($foreign_key, $this->{$localkey}));
-        //return $entity::where($foreign_key, $this->{$localkey})->first();
     }
 
 
@@ -42,7 +41,6 @@ trait Relationship
         if (empty($local_key))
             $local_key = $this->generateKeyName($entity);
         return new UniqueRelationship($entity::where($related_key, $this->{$local_key}));
-        //return $entity::where($related_key, $this->{$local_key})->first();
     }
 
 
@@ -64,7 +62,6 @@ trait Relationship
         if (empty($localkey))
             $localkey = get_called_class()::$primaryKey;
         return new UniqueRelationship($entity::where($foreign_key, $this->{$localkey}), true);
-        // return $entity::where($foreign_key, $this->{$localkey})->get();
     }
 
 

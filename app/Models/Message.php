@@ -23,6 +23,7 @@ class Message extends Model
      */
     protected static $attributes = ['type', 'message', 'user_id', 'room_id'];
 
+    protected $hidden = ["updated_at","room_id"]; 
     public function user(){
         return $this->belongsTo(User::class);
     }
