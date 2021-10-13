@@ -17,9 +17,9 @@ class RoomResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'label' => $this->firstname,
+            'label' => $this->label,
             'picture' => $this->picture,
-            'users' => UserRoom::where('room_id', $this->id)->get(),
+            'users' => $this->users,//UserRoom::where('room_id', $this->id)->get(),
             'messages' => $this->messages
         ];
     }
