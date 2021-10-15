@@ -8,6 +8,7 @@ use Framework\Core\Http\Resources\JsonResource;
 use Models\Room;
 use Framework\Facades\Hash;
 use Http\Resources\Room\RoomResource;
+use Models\User;
 use Models\UserRoom;
 
 class RoomController extends Controller
@@ -39,7 +40,7 @@ class RoomController extends Controller
      */
     public function store(Request $req){
         $room = Room::create([
-            'label' => null,
+            'label' => "Ma Room",
             'picture' => null
         ]);
         $req->user_ids[] = auth()->user()->id;
@@ -50,8 +51,6 @@ class RoomController extends Controller
             ]);
         }
         return $room;
-
-        return response()->json($room);
     }
 
     /**

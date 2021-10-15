@@ -23,7 +23,7 @@ class UserController extends Controller
         return Room::whereIn(
             "id",
             UserRoom::where('user_id', auth()->user()->id)->get()->pluck('room_id')
-        )->with('last_message')->get();
+        )->with('last_message')->orderBy('updated_at', 'desc')->get();
     }
 
 

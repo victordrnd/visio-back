@@ -9,7 +9,7 @@ class OrderByQuery{
 
     public function __construct($column, $direction = "ASC"){
         $this->column = $column;
-        if(in_array($direction, ["ASC", "DESC"]))
+        if(in_array($direction, ["ASC", "DESC", 'asc', 'desc']))
             $this->direction = $direction;
     }
 

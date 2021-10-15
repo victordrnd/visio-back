@@ -37,9 +37,9 @@ class Request
     }
 
 
-    public function input(string $input)
+    public function input(string $input, $default = null)
     {
-        return $this->{$input};
+        return $this->{$input} ?? null;
     }
 
 

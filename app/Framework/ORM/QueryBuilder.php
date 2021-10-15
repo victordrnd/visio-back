@@ -55,7 +55,7 @@ class QueryBuilder extends BaseQuery
             $values[$column] = $this->{$column};
         }
         if ($this->getPrimaryKeyValue() != 0) {
-            return !is_null($this->update($values)) ? true : null;
+            return !is_null($this->update([static::$primaryKey => $this->getPrimaryKeyValue()], $values)) ? true : null;
         } else {
             $item = self::create($values);
             if (!is_null($item)) {

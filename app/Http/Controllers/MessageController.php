@@ -26,6 +26,9 @@ class MessageController extends Controller
             'user_id' => auth()->user()->id,
             'room_id' => $req->room_id
         ]);
+        $room = Room::find($req->room_id);
+        $room->updated_at =  date("Y-m-d H:i:s");
+        $room->save();
         return response()->json($message);
     }
 
