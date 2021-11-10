@@ -2,6 +2,7 @@
 
 namespace Http\Controllers;
 
+use Http\Resources\Room\RoomResourceCollection;
 use Models\User;
 use Http\Resources\User\UserResourceCollection;
 use Models\Room;
@@ -20,10 +21,12 @@ class UserController extends Controller
 
     public function rooms()
     {
-        return Room::whereIn(
+        $rooms =  Room::whereIn(
             "id",
             UserRoom::where('user_id', auth()->user()->id)->get()->pluck('room_id')
         )->with('last_message')->get();
+
+        return new RoomResourceCollection($rooms);
     }
 
 

@@ -25,7 +25,7 @@ class Room extends Model
 
 
     public function messages(){
-        return $this->hasMany(Message::class)->limit(30)->orderBy('id', 'DESC');
+        return $this->hasMany(Message::class)->limit(80)->orderBy('id', 'DESC');
     }
 
     public function last_message(){

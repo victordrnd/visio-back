@@ -4,6 +4,7 @@
 namespace Framework\Core\Http\Resources;
 
 use Framework\Core\App;
+use Framework\Core\Contracts\Relationship\RelationshipInterface;
 use Framework\Core\Contracts\Resources\JsonResourceInterface;
 use Framework\Core\Model;
 
@@ -28,6 +29,13 @@ abstract class JsonResource implements JsonResourceInterface, \JsonSerializable{
     }
 
 
+
+    public function whenLoaded(string $relationName, $callable){
+        if(!($this->model->{$relationName}) instanceof RelationshipInterface){
+            return $callable();
+        }
+        return null;
+    }
 
     public function jsonSerialize() {
         return $this->toArray(App::request());

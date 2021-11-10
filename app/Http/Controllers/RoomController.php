@@ -8,6 +8,7 @@ use Framework\Core\Http\Resources\JsonResource;
 use Models\Room;
 use Framework\Facades\Hash;
 use Http\Resources\Room\RoomResource;
+use Http\Resources\Room\RoomResourceCollection;
 use Models\UserRoom;
 
 class RoomController extends Controller
@@ -28,7 +29,7 @@ class RoomController extends Controller
 
     
     public function list(){
-        return Room::orderBy('updated_at', 'DESC')->get();
+        return new RoomResourceCollection(Room::orderBy('updated_at', 'DESC')->get());
     }
 
     /**
